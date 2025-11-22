@@ -5,10 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shader View — Real-time Node Previews for Blender</title>
   <meta name="description" content="Shader View adds live previews directly above every node in the Shader Editor. No more plugging into Material Output to see what a node does.">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
   <style>
+
+
     :root {
-      --bg: #fcfcfc;
+      --bg: #fff;
       --text: #2d2d2d;
       --heading: #111;
       --accent: #0066cc;
@@ -19,7 +26,7 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.7;
+      line-height: 1.5;
       color: var(--text);
       background: var(--bg);
       min-height: 100vh;
@@ -47,70 +54,66 @@
 
     p { font-size: 1.15rem; margin-bottom: 1.3rem; }
 
+    strong { font-weight: 900; }
+
     a {
       color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
+      text-decoration: underline;
     }
-    a:hover { text-decoration: underline; }
 
-    strong { color: #000; }
+    a:hover { color: #000; }
 
+  
     .hero-gif {
       width: 100%;
       border-radius: 18px;
       box-shadow: var(--shadow);
       display: block;
-      margin: 50px auto;
+      margin: 30px auto 50px;
     }
 
-    /* Comparison Table */
-    .table-wrapper { overflow-x: auto; margin: 60px 0; }
-    .comparison-table {
-      min-width: 620px;
-      width: 100%;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      background: white;
+    
+    .material-check {
+      font-family: 'Material Icons';
+      color: #34C759;
+      font-size: 1.6em;
+      margin-right: 10px;
     }
-    .comparison-row {
-      display: flex;
-      padding: 20px;
-      align-items: center;
-      border-bottom: 1px solid #eaeaea;
-    }
-    .comparison-row.header {
-      background: #e6f0ff;
-      font-weight: 700;
-      font-size: 1.2rem;
-    }
-    .comparison-row:nth-child(even) { background: #f9fbff; }
-    .feature { flex: 2.2; font-weight: 600; }
-    .standard, .pro { flex: 1; text-align: center; font-size: 1.6em; }
 
+        
     /* Cards */
     .card-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 35px;
-      margin: 60px 0;
+      margin: 20px 0 40px;
     }
     .card {
+      border: 2px solid #e4e4e4;
+      overflow: hidden; 
       border-radius: 18px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
+      box-shadow: 0 20px 40px rgb(171 171 171 / 31%);
       background: white;
       display: flex;
       flex-direction: column;
+      transition: transform 0.3s;
+      height: 400px;
     }
     .card-caption {
-      padding: 26px;
-      background: var(--card-bg);
+      background: linear-gradient(135deg, #ebebeb, #dbdbdb);
+      color: #000; 
+      padding: 20px 30px;
       font-size: 1.15rem;
-      line-height: 1.5;
+      line-height: 1.3;
     }
-    .card img { width: 100%; display: block; }
+
+    .gif-container { 
+      position: relative; 
+      background: #0e0e0e;
+      height: 100%;
+    }
+
+    .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #0e0e0e;}
 
     /* Video */
     .video-embed {
@@ -121,7 +124,7 @@
       max-width: 100%;
       border-radius: 18px;
       box-shadow: var(--shadow);
-      margin: 60px 0;
+      margin: 50px 0 12px;
     }
     .video-embed iframe {
       position: absolute;
@@ -136,198 +139,611 @@
       padding-left: 0;
     }
     .checklist li {
-      padding-left: 2em;
-      position: relative;
       margin-bottom: 1em;
       font-size: 1.15rem;
     }
-    .checklist li::before {
-      content: "✅";
-      position: absolute;
-      left: 0;
+
+    .checklist  .material-check{
+      position: relative;
+      top: 4px;
+      font-size: 1.2em;
     }
 
-    @media (max-width: 768px) {
+
+    @media (max-width: 680px) {
       .container { padding: 40px 15px; }
       h2 { font-size: 2.4rem; }
       h3 { font-size: 1.8rem; }
       .card-grid { gap: 30px; }
     }
+
+
+
+    /* TITLES */
+.pricing-title {
+  font-size: 2.8em;
+  color: #1a1a1e;
+  margin: 0 0 80px;
+  text-align: center;
+}
+
+/* GRID */
+.pricing-grid {
+  display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
+/* PLAN CARD BASE */
+.plan-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 40px 30px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  position: relative;
+  border: 3px solid #eaeaea;
+}
+
+
+/* PLAN NAME */
+.plan-name {
+  font-size: 2em;
+  color: #333;
+  margin: 0 0 10px;
+}
+
+.pro-name {
+  color: #00ff9d;
+}
+
+/* DESCRIPTION */
+.plan-desc {
+  color: #666;
+  margin: 0 0 30px;
+  font-size: 1.2em;
+}
+
+/* PRICE */
+.plan-price {
+  font-size: 4em;
+  font-weight: bold;
+  color: #333;
+  margin: 20px 0;
+}
+
+.pro-price {
+  color: #00ff9d;
+}
+
+/* SUBTEXT */
+.plan-subline {
+  color: #888;
+  margin: 0 0 40px;
+}
+
+/* EXTRA LABEL */
+.plan-plus {
+  margin: 0 0 20px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* FEATURE LIST */
+.plan-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  font-size: 1.1em;
+  line-height: 1.5;
+}
+
+.plan-list li {
+  margin: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ICONS */
+.icon-check,
+.icon-mid {
+  font-size: 1.4em;
+  margin-right: 10px;
+}
+
+.icon-check {
+  color: #00ff9d;
+}
+
+.icon-mid {
+  color: #ffcc00;
+}
+
+/* PRO SPECIAL CHECK */
+.pro-check {
+  color: #00ff9d;
+}
+
+/* PRO CARD */
+.plan-pro {
+  border: 3px solid #00ff9d;
+  box-shadow: 0 25px 50px rgba(0,255,157,0.2);
+}
+
+/* BADGE */
+.plan-badge {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffd700;
+  color: #000;
+  padding: 8px 20px;
+  font-weight: bold;
+  font-size: 0.9em;
+  border-radius: 50px;
+  box-shadow: 0 2px 25px rgb(255 216 0 / 30%);
+}
+
+
+.faq details {
+  text-align: left;
+    border-bottom: 1px solid rgb(232 232 232 / 45%);
+    padding: clamp(16px, 3vw, 20px);
+    background: #fbfbfb;
+}
+
+    .faq summary {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: clamp(16px, 2.4vw, 18px);
+      padding-right: 30px;
+      position: relative;
+    }
+
+    .faq summary::after {
+      content: "▼";
+      position: absolute;
+      right: 0;
+      transition: transform 0.2s;
+    }
+
+    .faq details[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    .faq p {
+      margin-top: 12px;
+      opacity: 0.85;
+      font-size: clamp(14px, 2.1vw, 16px);
+      line-height: 1.6;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, #9a6dff, #ef46ad, #f43f5e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: #ef46ad;
+      font-weight: 900;
+    }
+
+    .cta-animated-btn {
+  display: inline-block;
+  padding: 14px 26px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 16px;
+
+  /* Base gradient */
+  background: linear-gradient(90deg, #ff6e00, #ffaa33);
+  position: relative;
+  overflow: hidden;
+
+  /* Glow */
+  box-shadow:
+    0 12px 28px rgba(255, 120, 0, 0.28),
+    0 0 20px rgba(255, 140, 0, 0.35);
+  
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Hover scale + stronger glow */
+.cta-animated-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 16px 38px rgba(255, 120, 0, 0.45),
+    0 0 30px rgba(255, 150, 0, 0.6);
+  color:#fff;
+}
+
+/* Shimmer animation overlay */
+.cta-animated-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 130%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.45) 50%,
+    rgba(255,255,255,0) 100%
+  );
+  transform: skewX(-20deg);
+  animation: ctaShine 2.2s infinite ease-in-out;
+}
+
+/* Animation keyframes */
+@keyframes ctaShine {
+  0% { left: -130%; }
+  60% { left: 130%; }
+  100% { left: 130%; }
+}
+
   </style>
 </head>
 
 <body>
   <div class="container">
 
-    <h2><strong>Shader View — A Smarter Way to Preview Your Nodes</strong></h2>
+    <h2><strong>See every material node live — without plugging into Material Output</strong></h2>
 
-    <p>Tired of endlessly switching nodes to the material output just to check their effect?<br>
-    <strong>Shader View</strong> simplifies your workflow by displaying <strong>real-time output previews</strong> directly <strong>above each node</strong>, making shader creation <strong>faster, more efficient, and more intuitive</strong>.</p>
+    <p>Editing shader materials can be frustrating — especially when they get complex.
+      Instead of endlessly connecting nodes to Material Output, <strong>Shader View</strong> gives you <strong>instant previews</strong> of every node in your material — updating in real time as you work, making shader creation <strong>faster, more efficient, and far more intuitive.</strong>.
+    </p>
 
-    <p>Available now on <a href="https://shadererror.gumroad.com/l/shader_view" target="_blank"><strong>Gumroad</strong></a></p>
+    <p>Available also on <a href="https://shadererror.gumroad.com/l/shader_view" target="_blank">Gumroad</a></p>
 
     <img class="hero-gif" src="https://assets.superhivemarket.com/cache/a1ad4ff84b5322e25240861f0a810a2c.gif" alt="Shader View main demonstration">
 
-    <h3><strong>Work Smarter, Not Harder</strong></h3>
-    <p>Editing shader materials can be frustrating — especially when they get complex. Instead of manually connecting each node to the material output, <strong>Shader View</strong> gives you instant previews of every node in your material at once.</p>
 
-    <h4><strong>Standard vs Pro</strong></h4>
 
-    <div class="table-wrapper">
-      <div class="comparison-table">
-        <div class="comparison-row header">
-          <div class="feature">Feature</div>
-          <div class="standard">Standard</div>
-          <div class="pro">Pro</div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Output Socket Selector</div>
-          <div class="standard"><span style="color:#34C759">✔️</span></div>
-          <div class="pro"><span style="color:#34C759">✔️</span></div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Real-time Multi-Node Preview</div>
-          <div class="standard"><span style="color:#34C759">✔️</span></div>
-          <div class="pro"><span style="color:#34C759">✔️</span></div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Preview Customization</div>
-          <div class="standard"><span style="color:#34C759">✔️</span></div>
-          <div class="pro"><span style="color:#34C759">✔️</span></div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Performance Controls</div>
-          <div class="standard" style="color:#d6990a">Limited</div>
-          <div class="pro" style="color:#34C759">Full</div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">UDIM Texture Support</div>
-          <div class="standard" style="color:#d6990a; font-size:90%">Active Tile Only</div>
-          <div class="pro" style="color:#34C759; font-size:90%">Switch All Tiles</div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Script Node Support</div>
-          <div class="standard" style="color:#FF3B30">❌</div>
-          <div class="pro" style="color:#34C759">✔️</div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Smart Preview (Masking)</div>
-          <div class="standard" style="color:#FF3B30">❌</div>
-          <div class="pro" style="color:#34C759">✔️</div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Scalar Features (Grid, Min/Max)</div>
-          <div class="standard" style="color:#FF3B30">❌</div>
-          <div class="pro" style="color:#34C759">✔️</div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Vector Splitting</div>
-          <div class="standard" style="color:#FF3B30">❌</div>
-          <div class="pro" style="color:#34C759">✔️</div>
-        </div>
-        <div class="comparison-row">
-          <div class="feature">Smart Zoom</div>
-          <div class="standard" style="color:#FF3B30">❌</div>
-          <div class="pro" style="color:#34C759">✔️</div>
-        </div>
+
+    <section class="section">
+      <div class="section-intro">
+        <h3><strong>What Shader View Does for You</strong></h3>
+        <p>
+          Shader View turns the Shader Editor into a <strong>visual map of your material</strong>.
+          Every important node gets its own preview on top, so you can instantly see how colors, masks,
+          and textures evolve across the tree — without changing any of your existing connections.
+        </p>
       </div>
+
+      <ul class="checklist">
+        <li><span class="material-check">check_box</span><strong>Preview Each Node Result</strong> — no more plugging into Material Output.</li>
+        <li><span class="material-check">check_box</span><strong>Real-Time Updates</strong> — changes appear instantly.</li>
+        <li><span class="material-check">check_box</span><strong>Show Scalar Map (Pro)</strong> — see real numeric values instead of guessing from clamped color results.</li>
+        <li><span class="material-check">check_box</span><strong>Stay non-destructive</strong> — Shader View never touches your original .blend file.</li>
+        <li><span class="material-check">check_box</span><strong>Fast and responsive</strong> — with separate background rendering process, smart cashing and performance controls.</li>
+      </ul>
+    </section>
+
+
+    <div class="intro-gn" 
+        style="margin-top: 60px; padding: 32px; border-radius: 24px; background: #000; color:#fff;">
+
+      <h2 style="margin-bottom: 12px;" class="gradient-text">Wish Shader View existed for Geometry Nodes? Now it does.</h2>
+
+      <p style="font-size: 1.15rem; line-height: 1.7; margin-bottom: 1.5rem;">
+        Meet Preview-it™ Add-on — real-time previews for everything inside your Geometry Tree:
+        geometry shapes, field values, attribute flow, selection masks, and more.
+        All without constantly checking the viewport, wiring temporary viewers, or digging through the spreadsheet, 
+
+      </p>
+
+      <a href="https://superhivemarket.com/products/preview-it" target="_blank"
+        class="cta-animated-btn">
+        🔥 Limited-Time Launch: <strong>60% OFF Early Access</strong>
+      </a>
+
     </div>
 
-    <h3><strong>Scalar Previews – Debug with Precision (Pro Only)</strong></h3>
-    <p><strong>Shader View Pro</strong> shows the real numerical values behind every node — no more guessing about clamped or negative data.</p>
+    <h3><strong>Features You’ll Use Every Day</strong></h3>
+
+    <h4>Scalar Map Previews – Precision Debugging That Changes the Way You Work With Materials</h4>
+
+    <p>
+      Stop guessing what your nodes are actually outputting. <strong>Shader View Pro</strong> overlays real numerical values and a color-coded scalar grid directly on every preview — instantly revealing clamped data, negatives, overbrights, and hidden errors that normal previews completely hide.
+    </p>
 
     <div class="video-embed">
       <iframe src="https://www.youtube.com/embed/vtq1K-BUFYg" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
     </div>
 
-    <p>🔹 Real value display 🔹 Scalar grid (red = >1.0, blue = negative) 🔹 Min/Max display 🔹 Multiple 3-channel modes (Luminance, Vector Length, Normal Dot)</p>
+    <p>🔹 <b>Real value grid</b>  🔹 <b>Heatmap view</b> (red > 1.0, blue = negative)  🔹 <b>Live Min/Max indicators</b>  🔹 <b>Multiple analysis modes</b> (Luminance, Vector Length, Normal Dot)</p>
 
-    <h4><strong>Other Pro Features</strong></h4>
-
-    <div class="card-grid">
+    <div class="card-grid" style="margin-top: 60px;">
       <div class="card">
-        <div class="card-caption">Switch UDIM tiles with <strong>Alt + Shift + Left Double Click</strong></div>
-        <img src="https://assets.superhivemarket.com/cache/900bfcc9b1878108d3bec1968f7d7c73.gif" alt="UDIM switching">
+        <div class="card-caption"><b>Switch UDIM</b> tiles with Alt + Shift + Left Double Click</div>
+        <div class="gif-container">
+          <img src="https://assets.superhivemarket.com/cache/900bfcc9b1878108d3bec1968f7d7c73.gif" alt="UDIM switching">
+        </div>
       </div>
       <div class="card">
-        <div class="card-caption"><strong>Vector Splitting</strong> – separate RGB/XYZ previews</div>
-        <img src="https://assets.superhivemarket.com/cache/f7d621b503d0a3bd4b765f62cb8e48ca.gif" alt="Vector splitting">
-      </div>
-    </div>
-
-    <h4><strong>Smart Preview – Keep Your Node Editor Clean (Pro)</strong></h4>
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-caption"><strong>OFF</strong> – previews can overlap nodes</div>
-        <img src="https://assets.superhivemarket.com/cache/42318412e37486b5a1be9c63cebef356.gif" alt="Smart Preview off">
-      </div>
-      <div class="card">
-        <div class="card-caption"><strong>ON</strong> – previews are masked automatically</div>
-        <img src="https://assets.superhivemarket.com/cache/8be1210d9d18e372ca466afecd2e9182.gif" alt="Smart Preview on">
+        <div class="card-caption"><b>Vector Splitting</b> – separate RGB/XYZ previews</div>
+        <div class="gif-container">
+          <img src="https://assets.superhivemarket.com/cache/f7d621b503d0a3bd4b765f62cb8e48ca.gif" alt="Vector splitting">
+        </div>
       </div>
     </div>
 
-    <h3><strong>Full Preview Customization (Standard & Pro)</strong></h3>
+    <div>
+      <h4>
+        <strong>Smart Preview Masking – Never Fight Overlapping Previews Again</strong>
+      </h4>
+      <p>
+        Previews automatically mask themselves around your nodes so you can actually <em>see</em> what you’re working on. 
+        No more dragging nodes around just to read a value or spot a connection.
+      </p>
+  
+      <div class="card-grid">
+        
+        <!-- OFF Card -->
+        <div class="card" style="background: rgba(220, 50, 50, 0.15); border: 2px solid #dc3232; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(220,50,50,0.2);">
+          <div class="card-caption" style="background: #dc3232; color: #fff; font-weight: bold; padding: 16px; text-transform: uppercase; ">
+            Off – Previews Hide Your Nodes
+          </div>
+          <div class="gif-container">
+            <img 
+              src="https://assets.superhivemarket.com/cache/42318412e37486b5a1be9c63cebef356.gif" 
+              alt="Smart Preview Masking OFF – previews overlap nodes" >
+          </div>
+        </div>
+  
+        <!-- ON Card -->
+        <div class="card" style="background: rgba(0, 255, 157, 0.15); border: 3px solid #00ff9d; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,255,157,0.25);">
+          <div class="card-caption" style="background: linear-gradient(90deg, #00ff9d, #00cc7a); color: #000; font-weight: bold; padding: 16px; text-transform: uppercase;">
+            ON – Clean, Readable Node Graph
+          </div>
+          <div class="gif-container">
+            <img 
+              src="https://assets.superhivemarket.com/cache/8be1210d9d18e372ca466afecd2e9182.gif" 
+              alt="Smart Preview Masking ON – previews are masked automatically">
+          </div>
+        </div>
+        
+      </div>
+  
+      <p>
+        One toggle → instantly cleaner workspace. Works on <strong>every</strong> preview, every time.
+      </p>
+    </div>
+
+    <h4><strong>Control Over Every Node Preview – Customize Exactly How You Need</strong></h4>
+
+    <p>Everyone’s workflow is unique. <strong>Shader View</strong> gives you full control over previews. Adjust each preview independently, ensuring the add-on works exactly the way you want.</p>
 
     <div class="card-grid">
       <div class="card">
-        <div class="card-caption">Adjust preview size per-node or globally</div>
-        <img src="https://assets.superhivemarket.com/cache/0b08eeedcae7c75c21235da33e45eb82.gif" alt="Size">
+        <div class="card-caption">Adjust previews size <b>per node</b> or <b>globally</b> – make room for details or keep your graph compact.</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/0b08eeedcae7c75c21235da33e45eb82.gif" alt="Size"></div>
       </div>
       <div class="card">
-        <div class="card-caption">Choose any output socket</div>
-        <img src="https://assets.superhivemarket.com/cache/e6c877bfd5e4a6ffc96f20e381f9a498.gif" alt="Socket selector">
+        <div class="card-caption">Choose <b>any output socket</b> — color, mask, normal, factor — whatever you need to inspect.</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/e6c877bfd5e4a6ffc96f20e381f9a498.gif" alt="Socket selector"></div>
       </div>
     </div>
 
     <div class="card-grid">
       <div class="card">
-        <div class="card-caption">Zoom & pan (Pro: Alt+Shift+Hold LMB)</div>
-        <img src="https://assets.superhivemarket.com/cache/fcaff04bb93e3f3ad2af0f1d8e51fc53.gif" alt="Zoom">
+        <div class="card-caption">Dive deep into details with zoom and pan (Alt+Shift+Hold LMB for precision control).</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/fcaff04bb93e3f3ad2af0f1d8e51fc53.gif" alt="Zoom"></div>
       </div>
       <div class="card">
-        <div class="card-caption">Resolution control (clarity vs performance)</div>
-        <img src="https://assets.superhivemarket.com/cache/f6cf81e6056ff6ff6745a7ccb661bd69.gif" alt="Resolution">
+        <div class="card-caption"> Adjust preview <b>resolution</b> for the right balance between clarity and performance.</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/f6cf81e6056ff6ff6745a7ccb661bd69.gif" alt="Resolution"></div>
       </div>
     </div>
 
     <div class="card-grid">
       <div class="card">
-        <div class="card-caption">Plane or Sphere model</div>
-        <img src="https://assets.superhivemarket.com/cache/dc22d480c84655efad54f57b6b976295.gif" alt="Model">
+        <div class="card-caption">Switch between <b>Plane</b> and <b>Sphere</b> preview models to match your shader type.</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/dc22d480c84655efad54f57b6b976295.gif" alt="Model"></div>
       </div>
       <div class="card">
-        <div class="card-caption">Perspective / Orthographic camera</div>
-        <img src="https://assets.superhivemarket.com/cache/febbce4fd67f9ca4c535e1e3f08ef096.gif" alt="Camera">
+        <div class="card-caption">Switch between a <b>Perspective</b> or <b>Orthographic</b> preview camera for more accurate shading evaluation.</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/febbce4fd67f9ca4c535e1e3f08ef096.gif" alt="Camera"></div>
       </div>
     </div>
 
-    <p>Per-node control of samples, engine (EEVEE/Cycles), lighting, etc.</p>
+    <p style="font-size: 1.4em; max-width: 1000px; margin: 0 auto 80px; opacity: 0.9; line-height: 1.6;">
+      <strong>Plus</strong> per-node tweaks for render samples, render engine (EEVEE/Cycles), lighting mode, and more – total flexibility without slowing you down.
+    </p>
 
-    <h3><strong>Fast Even on Massive Node Trees</strong></h3>
+    <h3><strong>Fast, Even on Monster Node Trees</strong></h3>
+
+    <p><strong>Shader View</strong> is designed for optimal performance, even on low-end machines. It processes node output previews in a <strong>background process</strong>, ensuring smooth workflow and real-time updates. Instead of updating all nodes at once, the add-on “chunks” the node tree, so you can balance speed vs. performance to match your needs. <br><br>
+    </p>
 
     <div class="card-grid">
       <div class="card">
-        <div class="card-caption">200+ nodes — still smooth</div>
-        <img src="https://assets.superhivemarket.com/cache/000ec3739d7be72232c34f7355b4fa43.gif" alt="Large tree">
+        <div class="card-caption">500+ Node Graphs — no lag, no crashes.</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/000ec3739d7be72232c34f7355b4fa43.gif" alt="Large tree"></div>
+        
       </div>
       <div class="card">
-        <div class="card-caption">Horizontal processing — instant feedback on connected nodes</div>
-        <img src="https://assets.superhivemarket.com/cache/28c86cbb809b7c9809fdf554919a4ea6.gif" alt="Propagation">
+        <div class="card-caption">Horizontal processing — updates the nearest connected nodes first for faster feedback.</div>
+        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/28c86cbb809b7c9809fdf554919a4ea6.gif" alt="Propagation"></div>
       </div>
     </div>
 
-    <h3><strong>Key Advantages</strong></h3>
-    <ul class="checklist">
-      <li>Real-time instant updates</li>
-      <li>Automatic sync of connected nodes</li>
-      <li>Background rendering — Blender stays responsive</li>
-      <li>100% non-destructive — no changes to your .blend files</li>
-    </ul>
+    <p><b>Note for MacOS users</b>: you will see an extra bouncing Blender icon in the Dock.  
+      This is expected — the background process launches a separate Blender 
+      instance to run the EEVEE rendering environment, and macOS shows each instance 
+      as its own app.</p>
 
-    <h3><strong>Who Needs This?</strong></h3>
-    <p>Anyone who touches the Shader Editor. If you build materials in Blender, Shader View will save you hours. Get it today and never plug into Material Output just to preview again. 🚀</p>
 
+    <h3><strong>Unlock the Full Power of Shader View</strong></h3>
+    <p>
+      Standard version gets you started with core previews. Pro version adds advanced debugging, smart tools, and pro-level customization to supercharge your workflow.
+    </p>
+
+
+    <div class="pricing-container" style="margin-top: 50px;">
+      
+      <div class="pricing-grid">
+  
+        <!-- Standard -->
+        <div class="plan-card">
+          <p class="plan-subline">One-time purchase · Lifetime updates</p>
+
+          <h3 class="plan-name">Standard</h3>
+          <p class="plan-desc">Perfect for learning, hobbyists, and light shader work</p>
+          
+          <div class="plan-price">$14.90</div>
+          
+  
+          <ul class="plan-list">
+            <li><span class="material-check">check</span>Node Preview</li>
+            <li><span class="material-check">check</span>Output Socket Selector</li>
+            <li><span class="material-check">check</span>Real-time Multi-Node Preview</li>
+            <li><span class="material-check">check</span>Preview Customization</li>
+            <li><span class="material-check" style="color: #FFC107;">check</span>Performance Controls (Limited)</li>
+            <li><span class="material-check" style="color: #FFC107;">check</span>UDIM Support (Active Tile Only)</li>
+            <li style="line-height: 1.3;font-size: 90%;"><span class="material-check" style="color: #333;">error</span>Includes all features available in the Node Preview Add-on</li>
+          </ul>
+        </div>
+  
+        <!-- Pro -->
+        <div class="plan-card plan-pro">
+          <div class="plan-badge">👑 Most Popular</div>
+          
+          <p class="plan-subline">One-time purchase · Lifetime updates</p>
+          <h3 class="plan-name pro-name">Pro</h3>
+          <p class="plan-desc">For professional artists who demand precision debugging and maximum productivity</p>
+          
+          <div class="plan-price pro-price">$24.90</div>
+          
+  
+          <p class="plan-plus">Everything in Standard, <strong>plus:</strong></p>
+  
+          <ul class="plan-list">
+            <li><span class="material-check">check</span>Full Performance Controls</li>
+            <li><span class="material-check">check</span>Switch All UDIM Tiles</li>
+            <li><span class="material-check">check</span>Script Node Support</li>
+            <li><span class="material-check">check</span>Smart Preview Masking</li>
+            <li><span class="material-check">check</span>Scalar Features (Grid, Min/Max, Real Values)</li>
+            <li><span class="material-check">check</span>Vector Splitting (RGB/XYZ)</li>
+            <li><span class="material-check">check</span>Smart Zoom & Advanced Modes</li>
+          </ul>
+  
+        </div>
+  
+      </div>
+  
+    </div>
+
+    <section class="section" style="margin: 80px 0;">
+
+      <div
+        style="
+          margin: 0 auto;
+          padding: 30px 32px;
+          border-radius: 26px;
+  
+          background: linear-gradient(135deg, rgb(255 140 0 / 79%), rgb(255 94 0));
+          border: 1px solid rgba(255,140,0,0.35);
+  
+          box-shadow: 0 10px 30px rgb(255 161 161 / 22%), 0 0 55px rgba(255, 140, 0, 0.20);
+  
+          backdrop-filter: blur(6px);
+          text-align: center;
+        "
+      >
+        <!-- HEADER -->
+        <h3
+          style="
+            font-size: clamp(20px, 3vw, 26px);
+            margin: 0 0 12px;
+            background: linear-gradient(90deg, #fff9de, #e1fd42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 25px rgba(255,140,0,0.5);
+            font-weight: 900;
+            letter-spacing: 0.4px;
+            color:#ffefae;
+          "
+        >
+          Every Purchase Supports Blender
+        </h3>
+  
+        <!-- TEXT -->
+        <p
+          style="
+            margin: 0;
+            font-size: clamp(14px, 2vw, 16px);
+            line-height: 1.7;
+            color: #fff;
+          "
+        >
+          When you purchase <span class="highlight">Shader View</span>, you’re directly helping push <span
+          style="
+            background: linear-gradient(90deg, #ffefae, #edff87);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+            color:#edff87;
+          "
+        >
+          Blender
+        </span> forward.
+          
+          
+          Part of every sale is contributed to the
+          <span
+            style="
+              background: linear-gradient(90deg, #ffefae, #edff87);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              font-weight: 700;
+              color:#edff87;
+            "
+          >
+            Blender Development Fund
+          </span>, supporting the developers who keep Blender free, powerful, and open-source for all of us.
+        </p>
+      </div>
+    </section>
+    
+    <section class="section">
+
+      <h3 style="text-align: center;"><strong>FAQ</strong></h3>
+
+      <div class="faq" style="margin: clamp(32px, 6vw, 50px) auto; max-width: 780px;">
+        <details>
+          <summary>What Blender versions are supported?</summary>
+          <p>
+            Shader View is tested on Blender 3.0 through 5.x on macOS, Windows, and Linux.
+          </p>
+        </details>
+        <details>
+          <summary>Does it modify my node tree?</summary>
+          <p>
+            No. Shader View is completely non-destructive. It evaluates your node tree and draws 
+            previews on top of nodes, but it never inserts, deletes, or edits any nodes, links, or 
+            scene data.
+          </p>
+        </details>
+        <details>
+          <summary>Will it slow down Blender?</summary>
+          <p>
+            Previews are rendered in a separate background process, and the add-on uses a smart 
+            caching system to avoid unnecessary re-rendering.  
+            You can lower resolution, reduce update rate, or hide previews entirely when working 
+            on heavy scenes — so you stay fully in control of performance.
+          </p>
+        </details>
+      </div>
+    </section>
+    
+
+    
+
+    
     <h3><strong>Support & Community</strong></h3>
     <p>Bugs or questions? Reach me on <a href="https://x.com/ShaderError" target="_blank">X/Twitter</a> or join the <a href="https://discord.gg/VyUQ7Ru64B" target="_blank">Discord</a> for updates and exclusive content.</p>
 
