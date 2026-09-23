@@ -1,773 +1,2409 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shader View — Real-time Node Previews for Blender</title>
-  <meta name="description" content="Shader View adds live previews directly above every node in the Shader Editor. No more plugging into Material Output to see what a node does.">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-  <style>
-
-
-    :root {
-      --bg: #fff;
-      --text: #2d2d2d;
-      --heading: #111;
-      --accent: #0066cc;
-      --card-bg: #f0f7ff;
-      --shadow: 0 12px 40px rgba(0,0,0,0.12);
-    }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      line-height: 1.5;
-      color: var(--text);
-      background: var(--bg);
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 800px;
-      min-width: 300px;
-      margin: 0 auto;
-      padding: 60px 20px 100px;
-    }
-
-    h2, h3, h4, h5 {
-      color: var(--heading);
-      font-weight: 800;
-      margin-top: 3rem;
-      margin-bottom: 1rem;
-      line-height: 1.2;
-    }
-
-    h2 { font-size: 2.8rem; margin-top: 1.5rem; }
-    h3 { font-size: 2rem; }
-    h4 { font-size: 1.6rem; }
-    h5 { font-size: 1.4rem; }
-
-    p { font-size: 1.15rem; margin-bottom: 1.3rem; }
-
-    strong { font-weight: 900; }
-
-    a {
-      color: var(--accent);
-      text-decoration: underline;
-    }
-
-    a:hover { color: #000; }
-
-  
-    .hero-gif {
-      width: 100%;
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      display: block;
-      margin: 30px auto 50px;
-    }
-
-    
-    .material-check {
-      font-family: 'Material Icons';
-      color: #34C759;
-      font-size: 1.6em;
-      margin-right: 10px;
-    }
-
-        
-    /* Cards */
-    .card-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 35px;
-      margin: 20px 0 40px;
-    }
-    .card {
-      border: 2px solid #e4e4e4;
-      overflow: hidden; 
-      border-radius: 18px;
-      box-shadow: 0 20px 40px rgb(171 171 171 / 31%);
-      background: white;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s;
-      height: 400px;
-    }
-    .card-caption {
-      background: linear-gradient(135deg, #ebebeb, #dbdbdb);
-      color: #000; 
-      padding: 20px 30px;
-      font-size: 1.15rem;
-      line-height: 1.3;
-    }
-
-    .gif-container { 
-      position: relative; 
-      background: #0e0e0e;
-      height: 100%;
-    }
-
-    .card img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; background: #0e0e0e;}
-
-    /* Video */
-    .video-embed {
-      position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      max-width: 100%;
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      margin: 50px 0 12px;
-    }
-    .video-embed iframe {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      border: 0;
-    }
-
-    /* Checklist */
-    .checklist {
-      list-style: none;
-      padding-left: 0;
-    }
-    .checklist li {
-      margin-bottom: 1em;
-      font-size: 1.15rem;
-    }
-
-    .checklist  .material-check{
-      position: relative;
-      top: 4px;
-      font-size: 1.2em;
-    }
-
-
-    @media (max-width: 680px) {
-      .container { padding: 40px 15px; }
-      h2 { font-size: 2.4rem; }
-      h3 { font-size: 1.8rem; }
-      .card-grid { gap: 30px; }
-    }
-
-
-
-    /* TITLES */
-.pricing-title {
-  font-size: 2.8em;
-  color: #1a1a1e;
-  margin: 0 0 80px;
-  text-align: center;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shader View — See every node. Instantly.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0b10;            /* page      */
+  --bg-soft: #14161e;       /* cards     */
+  --bg-tint: #1c1f29;       /* inputs    */
+  --border: #262a36;
+  --border-strong: #363b4b;
+  --text: #e8eaf2;
+  --text-soft: #a3a8ba;
+  --text-dim: #6d7385;
+  --ink: #ffffff;
+  --accent: #7c6bff;        /* indigo  */
+  --accent2: #1fd3ac;       /* teal    */
+  --accent3: #ff9152;       /* orange  */
+  --accent4: #e264f0;       /* magenta */
+  --accent-a12: rgba(124,107,255,.13);
+  --accent-a30: rgba(124,107,255,.34);
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --radius: 16px;
+  --radius-sm: 9px;
+  --shadow: 0 1px 2px #00000059, 0 10px 30px #00000047;
 }
 
-/* GRID */
-.pricing-grid {
-  display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* PLAN CARD BASE */
-.plan-card {
-  background: #fff;
-  border-radius: 24px;
-  padding: 40px 30px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-  position: relative;
-  border: 3px solid #eaeaea;
+.wrapper { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+/* ── HERO ── */
+#hero { text-align: center; padding: 80px 0 24px; position: relative; }
+
+.hero-content .title {
+  font-family: var(--font-display);
+  font-size: clamp(30px, 5.4vw, 52px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+  color: var(--text);
 }
-
-
-/* PLAN NAME */
-.plan-name {
-  font-size: 2em;
-  color: #333;
-  margin: 0 0 10px;
-}
-
-.pro-name {
-  color: #00ff9d;
-}
-
-/* DESCRIPTION */
-.plan-desc {
-  color: #666;
-  margin: 0 0 30px;
-  font-size: 1.2em;
-}
-
-/* PRICE */
-.plan-price {
-  font-size: 4em;
-  font-weight: bold;
-  color: #333;
-  margin: 20px 0;
-}
-
-.pro-price {
-  color: #00ff9d;
-}
-
-/* SUBTEXT */
-.plan-subline {
-  color: #888;
-  margin: 0 0 40px;
-}
-
-/* EXTRA LABEL */
-.plan-plus {
-  margin: 0 0 20px;
-  color: #333;
-  font-weight: bold;
-}
-
-/* FEATURE LIST */
-.plan-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  text-align: left;
-  font-size: 1.1em;
-  line-height: 1.5;
-}
-
-.plan-list li {
-  margin: 12px 0;
-  display: flex;
-  align-items: center;
-}
-
-/* ICONS */
-.icon-check,
-.icon-mid {
-  font-size: 1.4em;
-  margin-right: 10px;
-}
-
-.icon-check {
-  color: #00ff9d;
-}
-
-.icon-mid {
-  color: #ffcc00;
-}
-
-/* PRO SPECIAL CHECK */
-.pro-check {
-  color: #00ff9d;
-}
-
-/* PRO CARD */
-.plan-pro {
-  border: 3px solid #00ff9d;
-  box-shadow: 0 25px 50px rgba(0,255,157,0.2);
-}
-
-/* BADGE */
-.plan-badge {
-  position: absolute;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ffd700;
-  color: #000;
-  padding: 8px 20px;
-  font-weight: bold;
-  font-size: 0.9em;
-  border-radius: 50px;
-  box-shadow: 0 2px 25px rgb(255 216 0 / 30%);
-}
-
-
-.faq details {
-  text-align: left;
-    border-bottom: 1px solid rgb(232 232 232 / 45%);
-    padding: clamp(16px, 3vw, 20px);
-    background: #fbfbfb;
-}
-
-    .faq summary {
-      cursor: pointer;
-      font-weight: 600;
-      font-size: clamp(16px, 2.4vw, 18px);
-      padding-right: 30px;
-      position: relative;
-    }
-
-    .faq summary::after {
-      content: "▼";
-      position: absolute;
-      right: 0;
-      transition: transform 0.2s;
-    }
-
-    .faq details[open] summary::after {
-      transform: rotate(180deg);
-    }
-
-    .faq p {
-      margin-top: 12px;
-      opacity: 0.85;
-      font-size: clamp(14px, 2.1vw, 16px);
-      line-height: 1.6;
-    }
-
-    .gradient-text {
-      background: linear-gradient(90deg, #9a6dff, #ef46ad, #f43f5e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: #ef46ad;
-      font-weight: 900;
-    }
-
-    .cta-animated-btn {
-  display: inline-block;
-  padding: 14px 26px;
-  font-size: 1.25rem;
+.hero-content h1 .title {
   font-weight: 700;
-  letter-spacing: 0.3px;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 16px;
+}
+.gradient-text {
+  background: linear-gradient(100deg, var(--accent) 5%, var(--accent4) 50%, var(--accent3) 95%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.gt-teal   { background: linear-gradient(100deg, var(--accent2), var(--accent)); -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent; }
+.gt-orange { background: linear-gradient(100deg, var(--accent3), var(--accent4)); -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent; }
+.gt-indigo { background: linear-gradient(100deg, var(--accent), var(--accent2)); -webkit-background-clip: text; background-clip:text; -webkit-text-fill-color: transparent; }
 
-  /* Base gradient */
-  background: linear-gradient(90deg, #ff6e00, #ffaa33);
+.hero-sub {
+  max-width: 640px;
+  margin: 22px auto 0;
+  font-size: 18px;
+  color: var(--text-soft);
+}
+.hero-compat { margin-top: 26px; font-size: 13.5px; color: var(--text-dim); font-family: var(--font-mono); }
+.hero-compat span { color: var(--text); font-weight: 500; }
+
+.hero-pitch {
+  max-width: 700px;
+  margin: 42px auto 0;
+  text-align: left;
+  font-size: 17.5px;
+  color: var(--text-soft);
+  font-weight: 300;
+}
+.hero-pitch strong { color: var(--text); font-weight: 600; }
+.hero-pitch p + p { margin-top: 16px; }
+
+/* ── NEW-IN-2.0 BADGE ── */
+.new-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(100deg, var(--accent2), var(--accent));
+  border-radius: 100px;
+  padding: 2px 9px;
+  margin-left: 8px;
+  vertical-align: middle;
+  transform: translateY(-1px);
+  white-space: nowrap;
+}
+.ver-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  color: var(--accent);
+  background: var(--accent-a12);
+  border: 1px solid var(--accent-a30);
+  border-radius: 100px;
+  padding: 5px 18px;
+  margin-bottom: 18px;
+}
+
+/* ── WIREFRAME BACKGROUND (section 02) ── */
+#modes { position: relative; }
+.wire-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: .75;
+  mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+}
+#modes .section-header, #modes .section-inner { position: relative; z-index: 1; padding: 40px 0; }
+
+/* ── FRACTAL TREES BACKGROUND (section 04) ── */
+#focus { position: relative; }
+#focus .section-header, #focus .section-inner { position: relative; z-index: 1; }
+.frac-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 430px;               /* behind the header text only */
+  z-index: 0;
+  pointer-events: none;
+  opacity: .5;
+  mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 82%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 82%, transparent 100%);
+}
+
+/* ── SPEED STREAKS BACKGROUND (section 06) ── */
+#performance { position: relative; }
+#performance .section-header, #performance .section-inner { position: relative; z-index: 1; }
+.speed-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 440px;               /* behind the header text */
+  z-index: 0;
+  pointer-events: none;
+  opacity: .6;
+  mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 85%, transparent 100%);
+}
+
+/* ── FLYING PREVIEW GALLERY (section 01) ── */
+#previews { position: relative; }
+#previews .section-header, #previews .section-inner { position: relative; z-index: 1; padding: 40px 0;}
+.gal-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;               /* behind the header text */
+  z-index: 0;
+  pointer-events: none;
+  opacity: .5;
+  mask-image: 
+    linear-gradient(to bottom, transparent, black 15%, black 85%, transparent),
+    linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+  mask-composite: intersect;
+}
+
+/* ── UV BACKGROUND (section 04) ── */
+#uv { position: relative; }
+#uv .section-header, #uv .section-inner { position: relative; z-index: 1; }
+.uv-bg {
+  filter: blur(0.35px);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 460px;               /* behind the header text */
+  z-index: 0;
+  pointer-events: none;
+  opacity: .85;
+  mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 10%, #000 85%, transparent 100%);
+}
+
+/* ── NEON WARP BACKGROUND (v1 → v2 compare) ── */
+#compare { position: relative; }
+#compare .section-header, #compare .section-inner, #compare .cmp { position: relative; z-index: 1; }
+.cmp-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 560px;               /* behind the header + the top of the table */
+  z-index: 0;
+  pointer-events: none;
+  opacity: .85;
+  mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 12%, #000 62%, transparent 100%);
+}
+
+/* ── "SOLVES" LINE on every feature card ── */
+.solves {
+  display: block;
+  margin-top: 10px;
+  padding-top: 9px;
+  border-top: 1px dashed var(--border-strong);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+.solves b {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  display: block;
+  margin-bottom: 3px;
+  font-weight: 600;
+}
+.mode-card .solves { border-top-color: rgba(255,255,255,.12); }
+
+/* ── UV feature cards ── */
+.uv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+/* ── FLOATING NUMBERS BACKGROUND (section 03) ── */
+#scalar { position: relative; }
+#scalar .section-header, #scalar .section-inner { position: relative; z-index: 1; }
+.num-bg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;               /* behind the header text */
+  z-index: 0;
+  pointer-events: none;
+  opacity: .5!important;
+  mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+}
+
+/* ── SECTIONS ── */
+.section { padding: 88px 0 8px; }
+.section-header { text-align: center; position: relative; }
+.section-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-a12);
+  border: 1px solid var(--accent-a30);
+  border-radius: 100px;
+  padding: 5px 16px;
+  margin-bottom: 22px;
+}
+.webgl-canvas {
+  position: absolute;
+  top: -30px; left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 92vw);
+  height: 190px;
+  z-index: -1;
+  opacity: .75;
+  border-radius: 20px;
+  filter: blur(0.5px);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 75%);
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 4.6vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+  color: var(--text);
+}
+.section-desc {
+  max-width: 620px;
+  margin: 18px auto 0;
+  color: var(--text-soft);
+  font-size: 16.5px;
+}
+
+/* media placeholder */
+.section-video {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.video-placeholder {
+  aspect-ratio: 16/9;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 14px, #ffffff07 14px, #ffffff07 28px),
+    linear-gradient(160deg, #171a23, #10121a);
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-align: center;
+  padding: 24px;
+}
+.video-placeholder .ph-icon { font-size: 30px; opacity: .45; }
+.video-yt-link { text-align: center; margin-top: 12px; font-size: 13px; color: var(--text-dim); }
+.video-yt-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+.feature-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 22px; }
+.feature-chip {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border-strong);
+  color: var(--text-soft);
+}
+
+.under-desc { text-align: center; margin-top: 18px; color: var(--text-dim); font-size: 15px; max-width: 640px; margin-left:auto; margin-right:auto; }
+.under-desc strong { color: var(--text-soft); }
+
+/* ── MODE CARDS ── */
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+  margin-top: 36px;
+}
+.mode-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 26px;
+  box-shadow: var(--shadow);
+  text-align: left;
   position: relative;
   overflow: hidden;
-
-  /* Glow */
-  box-shadow:
-    0 12px 28px rgba(255, 120, 0, 0.28),
-    0 0 20px rgba(255, 140, 0, 0.35);
-  
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-
-/* Hover scale + stronger glow */
-.cta-animated-btn:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 16px 38px rgba(255, 120, 0, 0.45),
-    0 0 30px rgba(255, 150, 0, 0.6);
-  color:#fff;
-}
-
-/* Shimmer animation overlay */
-.cta-animated-btn::before {
-  content: "";
+.mode-card::before {
+  content: '';
   position: absolute;
-  top: 0;
-  left: -130%;
-  width: 130%;
-  height: 100%;
-  background: linear-gradient(
-    120deg,
-    rgba(255,255,255,0) 0%,
-    rgba(255,255,255,0.45) 50%,
-    rgba(255,255,255,0) 100%
-  );
-  transform: skewX(-20deg);
-  animation: ctaShine 2.2s infinite ease-in-out;
+  top: 0; left: 0; right: 0;
+  height: 4px;
 }
 
-/* Animation keyframes */
-@keyframes ctaShine {
-  0% { left: -130%; }
-  60% { left: 130%; }
-  100% { left: 130%; }
+.mode-key {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.mode-card h3 {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  margin: 6px 0 10px;
+  color: var(--text);
+}
+.mode-card p { font-size: 14.5px; color: var(--text-soft); }
+.mode-card .mode-extra { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-dim); }
+.mode-card .mode-extra strong { color: var(--text-soft); font-family: var(--font-mono); font-weight: 500; }
+
+/* ── SCALAR TOOL LIST ── */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+  margin-top: 36px;
+  text-align: left;
+}
+.tool-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+}
+.tool-icon {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 19px;
+  margin-bottom: 12px;
+  font-family: var(--font-mono);
+}
+.ti-indigo  { background: rgba(124,107,255,.16); color: var(--accent); }
+.ti-teal    { background: rgba(31,211,172,.15);  color: var(--accent2); }
+.ti-orange  { background: rgba(255,145,82,.16); color: var(--accent3); }
+.ti-magenta { background: rgba(226,100,240,.16); color: var(--accent4); }
+.tool-card h3 { font-family: var(--font-display); font-size: 17.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+/* per-tool GIF slot: drop an <img>/<video> in — the placeholder styling
+   disappears as soon as real media fills the box */
+.tool-media {
+  aspect-ratio: 16/10;
+  border-radius: 10px;
+  border: 1px dashed var(--border-strong);
+  overflow: hidden;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 10px, #ffffff07 10px, #ffffff07 20px),
+    linear-gradient(160deg, #171a23, #10121a);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 10px;
+}
+.tool-media img, .tool-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tool-card p { font-size: 14px; color: var(--text-soft); }
+.tool-card code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--bg-tint);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 6px;
+  color: var(--text);
 }
 
-  </style>
+/* ── CALLOUT ── */
+.callout {
+  max-width: 700px;
+  margin: 34px auto 0;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent2);
+  border-radius: var(--radius-sm);
+  padding: 18px 24px;
+  font-size: 15px;
+  color: var(--text-soft);
+  text-align: left;
+  box-shadow: var(--shadow);
+}
+.callout strong { color: var(--accent2); }
+
+/* ── HOTKEYS ── */
+.keys-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+  margin-top: 36px;
+  text-align: left;
+}
+.key-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+}
+.key-cap {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-tint);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 3px 9px;
+  color: var(--text);
+  white-space: nowrap;
+}
+.key-desc { font-size: 13px; color: var(--text-soft); }
+
+/* ── END CTA ── */
+#cta { text-align: center; padding: 100px 0 40px; }
+#cta .section-title { margin-bottom: 14px; }
+.cta-btn {
+  display: inline-block;
+  margin-top: 28px;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(110deg, var(--accent), var(--accent4));
+  padding: 15px 40px;
+  border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(124,107,255,.42);
+  transition: transform .18s, box-shadow .18s;
+}
+.cta-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 40px rgba(124,107,255,.58); }
+.cta-note { margin-top: 16px; font-size: 13px; color: var(--text-dim); font-family: var(--font-mono); }
+.human-made a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+.sep-line { border: none; border-top: 1px solid var(--border); max-width: 300px; margin: 80px auto 0; }
+
+/* ── V1 → V2 COMPARISON ── */
+.cmp {
+  margin-top: 34px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-soft);
+  box-shadow: var(--shadow);
+}
+.cmp-head, .cmp-row {
+  display: grid;
+  grid-template-columns: 1fr 150px 200px;
+  align-items: center;
+  gap: 0;
+}
+.cmp-head {
+  background: var(--bg-tint);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.cmp-head > div, .cmp-row > div { padding: 13px 18px; }
+.cmp-head .c-v1, .cmp-row .c-v1,
+.cmp-head .c-v2, .cmp-row .c-v2 { text-align: center; }
+.cmp-head .c-v2 { color: var(--accent); }
+.cmp-row { border-top: 1px solid var(--border); font-size: 14.5px; }
+.cmp-row:hover { background: #ffffff05; }
+.cmp-row .c-feat { color: var(--text); }
+.cmp-row .c-feat small { display: block; color: var(--text-dim); font-size: 12.5px; margin-top: 2px; }
+/* the 2.0 column is the hero column: tinted stripe down the table */
+.cmp-head .c-v2, .cmp-row .c-v2 {
+  background: linear-gradient(180deg, rgba(124,107,255,.07), rgba(124,107,255,.07));
+  border-left: 1px solid var(--border);
+}
+.cmp-group {
+  padding: 11px 18px 9px;
+  border-top: 1px solid var(--border);
+  background: #ffffff04;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.yes  { color: var(--accent2); font-weight: 600; }
+.yes2 { color: var(--accent); font-weight: 600; }
+.no   { color: var(--text-dim); opacity: .55; }
+.cmp-txt   { font-size: 13px; color: var(--text-soft); }
+.cmp-txt-2 { font-size: 13px; color: var(--text); font-weight: 500; }
+.cmp-note {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+@media (max-width: 680px) {
+  .cmp-head { display: none; }
+  .cmp-row { grid-template-columns: 1fr; }
+  .cmp-row > div { padding: 8px 16px; }
+  .cmp-row .c-feat { padding-top: 14px; }
+  .cmp-row .c-v1::before { content: '1.x — '; color: var(--text-dim); font-family: var(--font-mono); font-size: 11px; }
+  .cmp-row .c-v2::before { content: '2.0 — '; color: var(--accent); font-family: var(--font-mono); font-size: 11px; }
+  .cmp-head .c-v1, .cmp-row .c-v1,
+  .cmp-head .c-v2, .cmp-row .c-v2 { text-align: left; border-left: none; }
+  .cmp-row .c-v2 { padding-bottom: 14px; }
+}
+
+@media (max-width: 640px) {
+  .section { padding: 64px 0 8px; }
+  .hero-pitch { font-size: 16px; }
+}
+
+/* ================================================================
+   SHADER VIEW PRO — MODERN PASS
+   Dense editorial layout / sharper hierarchy / less empty space
+   ================================================================ */
+:root{
+  --bg:#08090d;
+  --bg-soft:#101219;
+  --bg-tint:#171a22;
+  --border:rgba(255,255,255,.085);
+  --border-strong:rgba(255,255,255,.15);
+  --text:#f2f3f7;
+  --text-soft:#a9adba;
+  --text-dim:#6f7483;
+  --ink:#fff;
+  --accent:#8b7cff;
+  --accent2:#35d9b4;
+  --accent3:#ff9a63;
+  --accent4:#e96ff2;
+  --accent-a12:rgba(139,124,255,.11);
+  --accent-a30:rgba(139,124,255,.28);
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+  --radius:18px;
+  --radius-sm:11px;
+  --shadow:0 1px 1px rgba(0,0,0,.4),0 18px 55px rgba(0,0,0,.28);
+}
+
+html{background:var(--bg)}
+body{
+  background:
+    radial-gradient(900px 500px at 50% -180px,rgba(116,98,255,.14),transparent 68%),
+    var(--bg);
+  font-size:15.5px;
+  line-height:1.62;
+  letter-spacing:-.005em;
+}
+body:before{
+  content:"";
+  position:fixed; inset:0; pointer-events:none; z-index:-1;
+  opacity:.035;
+  background-image:radial-gradient(rgba(255,255,255,.8) .55px,transparent .55px);
+  background-size:5px 5px;
+}
+.wrapper{max-width:1160px;padding:0 28px}
+
+.brand{display:flex;align-items:center;gap:9px;color:var(--text);text-decoration:none;font-family:var(--font-display);font-weight:600;font-size:14px;white-space:nowrap}
+.brand b{font-weight:400;color:var(--text-dim)}
+.brand-mark{
+  width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  color:#fff;font:600 10px var(--font-mono);
+  background:linear-gradient(135deg,var(--accent),var(--accent4));
+  box-shadow:0 5px 18px rgba(139,124,255,.28);
+}
+.nav-links{display:flex;align-items:center;justify-content:center;gap:4px;flex:1}
+.nav-links a{
+  color:var(--text-dim);text-decoration:none;font-size:12px;font-weight:500;
+  padding:8px 11px;border-radius:9px;transition:.18s ease;
+}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.055)}
+.nav-cta{
+  color:#fff;text-decoration:none;font:600 11px var(--font-mono);
+  padding:9px 13px;border-radius:9px;background:rgba(139,124,255,.14);
+  border:1px solid rgba(139,124,255,.28);
+}
+.nav-cta span{opacity:.7;margin-left:3px}
+
+/* hero */
+#hero{padding:80px 0 58px}
+.hero-kicker{
+  margin-bottom:17px;color:var(--text-dim);
+  font:500 11px var(--font-mono);letter-spacing:.14em;text-transform:uppercase;
+}
+.hero-content .title{
+  font-size:clamp(42px,6.4vw,76px);
+  letter-spacing:-.055em;line-height:.99;font-weight:600;
+}
+.hero-content h1{margin:0}
+.gradient-text{
+  background:linear-gradient(100deg,#9c91ff 0%,#d67cf0 53%,#ffab75 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.hero-sub{
+  max-width:700px;margin:26px auto 0;font-size:17px;line-height:1.68;color:#aeb2bf;
+}
+.hero-sub strong{color:var(--text);font-weight:600}
+.hero-meta{
+  margin:27px auto 0;display:flex;justify-content:center;align-items:center;gap:11px;
+  color:var(--text-dim);font:500 10px var(--font-mono);letter-spacing:.09em;
+}
+.hero-meta i{width:3px;height:3px;border-radius:50%;background:#4d5260}
+.hero-meta .meta-new{color:var(--accent2)}
+.hero-pitch{
+  max-width:820px;margin:40px auto 0!important;padding:18px 22px;
+  border:1px solid var(--border);border-radius:12px;background:rgba(255,255,255,.025);
+  color:#8f94a3!important;font-size:13px!important;line-height:1.65!important;
+}
+.hero-pitch strong{color:#d8dae2}
+
+/* sections */
+.section{padding:32px 0 0}
+.section + .section{padding-top:104px}
+.section-header{max-width:850px;margin:0 auto}
+.section-badge{
+  margin-bottom:16px;padding:5px 11px;border-radius:7px;
+  font-size:9.5px;letter-spacing:.13em;background:rgba(139,124,255,.08);
+  border-color:rgba(139,124,255,.22)
+}
+.section-title{
+  font-size:clamp(30px,4.2vw,48px);letter-spacing:-.045em;line-height:1.04;
+}
+.section-desc{max-width:680px;margin:16px auto 0;font-size:15px;line-height:1.68;color:#979ca9}
+.under-desc{margin-top:14px;font-size:13px}
+
+/* make media feel like product screenshots rather than placeholders */
+.section-video{
+  border-radius:15px;
+  background:linear-gradient(145deg,#131620,#0d0f15);
+  border-color:rgba(255,255,255,.10);
+  box-shadow:0 20px 60px rgba(0,0,0,.25);
+}
+.video-placeholder{aspect-ratio:16/8.2;min-height:230px;background:
+  radial-gradient(circle at 50% 40%,rgba(139,124,255,.09),transparent 38%),
+  repeating-linear-gradient(135deg,transparent,transparent 15px,rgba(255,255,255,.018) 15px,rgba(255,255,255,.018) 30px),
+  linear-gradient(160deg,#171a24,#0d0f15);
+}
+.video-placeholder .ph-icon{font-size:22px;color:#bbb;opacity:.7}
+
+/* chips */
+.feature-list{gap:6px;margin-top:16px}
+.feature-chip{
+  font-size:10.5px;padding:5px 10px;border-radius:7px;
+  background:rgba(255,255,255,.025);border-color:rgba(255,255,255,.10);
+}
+
+/* cards */
+.mode-grid,.tool-grid,.uv-grid{gap:12px;margin-top:28px}
+.mode-card,.tool-card{
+  padding:22px;border-radius:15px;
+  background:linear-gradient(145deg,rgba(20,22,30,.96),rgba(14,16,22,.96));
+  border-color:rgba(255,255,255,.075);
+  box-shadow:0 10px 34px rgba(0,0,0,.18);
+  transition:transform .2s ease,border-color .2s ease,background .2s ease;
+}
+.mode-card:hover,.tool-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(255,255,255,.15);
+  background:linear-gradient(145deg,#171a23,#101219);
+}
+.mode-card h3{font-size:19px;margin:6px 0 8px;letter-spacing:-.02em}
+.mode-card p,.tool-card p{font-size:13px;line-height:1.58}
+.tool-card{padding:19px 20px}
+.tool-card h3{font-size:16px;letter-spacing:-.015em}
+.tool-icon{width:34px;height:34px;border-radius:9px;font-size:16px;margin-bottom:10px}
+.tool-media{aspect-ratio:16/8.5;margin:-1px -1px 13px;border-radius:9px;background:
+  radial-gradient(circle at 50% 45%,rgba(139,124,255,.07),transparent 50%),
+  linear-gradient(160deg,#171a23,#101219);
+}
+.solves{margin-top:11px;padding-top:9px;font-size:11.5px;line-height:1.48;color:#747987}
+.solves b{font-size:9px;margin-bottom:3px}
+.new-badge{font-size:8px;padding:2px 6px;margin-left:6px}
+
+/* callouts */
+.callout{
+  margin:25px auto 0;padding:15px 18px;border-radius:11px;
+  background:rgba(53,217,180,.035);border:1px solid rgba(53,217,180,.12);
+  border-left:2px solid var(--accent2);font-size:13px;line-height:1.6;
+}
+
+/* comparison */
+.cmp{margin-top:28px;border-radius:15px;background:rgba(16,18,25,.9);box-shadow:var(--shadow)}
+.cmp-head,.cmp-row{grid-template-columns:1fr 130px 170px}
+.cmp-head>div,.cmp-row>div{padding:11px 16px}
+.cmp-row{font-size:13px}
+.cmp-row .c-feat small{font-size:11px}
+.cmp-group{padding:9px 16px 7px;font-size:9px}
+
+/* shortcuts */
+#keys{max-width:940px;margin:0 auto}
+.keys-grid{gap:7px;margin-top:22px}
+.key-row{padding:9px 12px;border-radius:9px;background:rgba(255,255,255,.025)}
+.key-cap{font-size:10px;padding:3px 7px}
+.key-desc{font-size:11.5px}
+
+/* CTA */
+#cta{padding:130px 0 25px;position:relative}
+.cta-orbit{
+  width:86px;height:86px;margin:0 auto 26px;border:1px solid rgba(139,124,255,.25);
+  border-radius:50%;position:relative;box-shadow:0 0 60px rgba(139,124,255,.09);
+}
+.cta-orbit:before,.cta-orbit:after{
+  content:"";position:absolute;inset:13px;border:1px dashed rgba(255,255,255,.10);border-radius:50%;
+}
+.cta-orbit:after{inset:31px;border-style:solid;border-color:rgba(53,217,180,.3)}
+.cta-orbit span{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.cta-orbit span:nth-child(1){top:9px;left:40px}
+.cta-orbit span:nth-child(2){right:13px;bottom:20px;background:var(--accent3)}
+.cta-orbit span:nth-child(3){left:16px;bottom:25px;background:var(--accent2)}
+.cta-kicker{margin-bottom:13px;color:var(--text-dim);font:500 9px var(--font-mono);letter-spacing:.15em}
+#cta .section-title{font-size:clamp(31px,4.5vw,52px)}
+#cta .section-desc{max-width:570px;font-size:14px}
+.cta-btn{margin-top:23px;padding:13px 25px;font-size:14px;border-radius:10px;box-shadow:0 12px 35px rgba(124,107,255,.28)}
+.cta-note{font-size:10px}
+
+/* divider + footer */
+.sep-line{max-width:100%;margin:100px 0 0;border-color:rgba(255,255,255,.065)}
+footer{margin-top:50px;padding:22px 0 36px;border-color:rgba(255,255,255,.065);font-size:11px}
+
+/* background art should support hierarchy, not compete with it */
+.wire-bg,.num-bg,.frac-bg,.speed-bg,.gal-bg,.uv-bg,.cmp-bg{opacity:.35;}
+.webgl-canvas{opacity:.48}
+
+/* mobile */
+@media(max-width:760px){
+  .wrapper{padding:0 16px}
+  .topbar{top:8px;margin-top:8px}
+  .nav-links{display:none}
+  .topbar{justify-content:space-between}
+  #hero{padding:88px 0 40px}
+  .hero-content .title{font-size:clamp(39px,12vw,58px)}
+  .hero-sub{font-size:15px;margin-top:21px}
+  .hero-meta{flex-wrap:wrap;gap:8px;margin-top:21px}
+  .hero-pitch{margin-top:28px!important}
+  .section{padding-top:58px}
+  .section + .section{padding-top:76px}
+  .section-title{font-size:clamp(29px,9vw,40px)}
+  .section-desc{font-size:14px}
+  .mode-grid,.tool-grid,.uv-grid{grid-template-columns:1fr}
+  .video-placeholder{min-height:180px}
+  .cmp-head{display:none}
+  .cmp-row{grid-template-columns:1fr}
+  .cmp-row>div{padding:7px 14px}
+  .cmp-row .c-feat{padding-top:13px}
+  .cmp-row .c-v1::before{font-size:9px}
+  .cmp-row .c-v2::before{font-size:9px}
+  #cta{padding-top:100px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important}
+}
+
+.tool-opts{
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-dim);
+}
+
+.tool-opts b{ color: #fff;}
+
+
+/* ── HUMAN-MADE NOTE ── */
+.human-made {
+  margin: 90px auto 3rem;
+  padding: 28px 30px;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,.075);
+  border-radius: 15px;
+  background: linear-gradient(145deg, rgba(20,22,30,.72), rgba(14,16,22,.72));
+}
+.human-made h3 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  letter-spacing: -.02em;
+  color: var(--text);
+}
+.human-made p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.human-made p + p { margin-top: 7px; }
+
+
+/* section videos (hosted on GitHub Pages) */
+.section-video-media{display:block;width:100%;height:auto;background:#0d0f15}
+
+/* launch sale banner */
+.sale-banner{top:0;z-index:50;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+  padding:10px 16px;text-align:center;font-family:var(--font-display);font-size:18px;color:#fff;
+  background:linear-gradient(90deg,#f04bff,#fb0000 35%,#e264f0 70%,#ff9152);
+  box-shadow:0 6px 24px rgba(124,107,255,.28)}
+.sale-banner strong{font-weight:700;letter-spacing:.01em}
+.sale-banner .sale-pill{font-family:var(--font-mono);font-size:12px;font-weight:600;letter-spacing:.06em;
+  padding:3px 9px;border-radius:999px;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.25)}
+.sale-banner .sale-left{font-family:var(--font-mono);font-size:12.5px;opacity:.9}
+@media (max-width:600px){.sale-banner{font-size:13px;gap:8px;padding:9px 12px}}
+
+/* FAQ */
+.faq{max-width:780px;margin:96px auto 0;text-align:center}
+.faq-list{margin-top:28px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.faq details{border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:0 22px;
+  background:linear-gradient(145deg,rgba(20,22,30,.72),rgba(14,16,22,.72));transition:border-color .2s}
+.faq details[open]{border-color:rgba(139,124,255,.32)}
+.faq summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  padding:17px 0;font-family:var(--font-display);font-size:16.5px;font-weight:600;color:var(--text)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';flex:none;font-family:var(--font-mono);font-size:20px;line-height:1;color:var(--accent);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding:0 0 18px;color:var(--text-soft);font-size:14.5px;line-height:1.7}
+
+/* Light Painter cross-promo */
+.lp-card{margin:60px auto 0;padding:36px 34px;border-radius:22px;text-align:center;
+  background:radial-gradient(circle at 50% 0%,rgba(255,45,149,.10),transparent 55%),#0a0a0f;
+  border:1px solid rgba(255,255,255,.08)}
+.lp-card h2{margin-bottom:14px;font-family:var(--font-display);font-size:clamp(26px,4vw,38px);font-weight:700;letter-spacing:-.02em;
+  background:linear-gradient(135deg,#ff6b35,#ff2d95,#c77dff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lp-card p{max-width:700px;margin:0 auto 24px;color:var(--text-soft);font-size:16px;line-height:1.7}
+.lp-card p strong{color:var(--text)}
+.video-embed{position:relative;aspect-ratio:16/9;margin:0 0 26px;border-radius:14px;overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);background:#000}
+.video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.cta-animated-btn{display:inline-flex;align-items:center;gap:6px;padding:14px 28px;border-radius:999px;color:#fff;text-decoration:none;
+  font-family:var(--font-display);font-size:16px;font-weight:500;
+  background:linear-gradient(90deg,#ff2d95,#c77dff);
+  box-shadow:0 12px 28px rgba(255,45,149,.28),0 0 20px rgba(199,125,255,.35);transition:transform .2s,box-shadow .2s}
+.cta-animated-btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(255,45,149,.36),0 0 26px rgba(199,125,255,.45)}
+@media (max-width:600px){.lp-card{padding:26px 18px}.faq details{padding:0 16px}}
+</style>
 </head>
-
 <body>
-  <div class="container">
+<div class="sale-banner" id="sale-banner" role="note">
+  <span class="sale-pill">LAUNCH SALE</span>
+  <span><strong>50% OFF</strong> until October 5</span>
+</div>
 
-    <h2><strong>See every material node live — without plugging into Material Output</strong></h2>
 
-    <p>Editing shader materials can be frustrating — especially when they get complex.
-      Instead of endlessly connecting nodes to Material Output, <strong>Shader View</strong> gives you <strong>instant previews</strong> of every node in your material — updating in real time as you work, making shader creation <strong>faster, more efficient, and far more intuitive.</strong>.
+<div class="wrapper">
+
+
+<!-- ═══════════ HERO ═══════════ -->
+<section id="hero">
+
+  
+  <div class="hero-content">
+    <span class="ver-pill">VERSION 2.0</span>
+    <p class="hero-kicker">Shader Material debugging, without leaving the node editor.</p>
+    <h1><span class="title">See every node.<br><span class="gradient-text">Understand every value.</span></span></h1>
+
+    <p class="hero-sub">
+      Tired of endlessly re-plugging nodes into the material output just to check their effect? ShaderView shows <strong>real-time output previews directly above each node</strong>, including histograms, heatmaps, reveal the actual values flowing through your material.<br>Faster, more efficient, more intuitive.
     </p>
-
-    <p>Available also on <a href="https://shadererror.gumroad.com/l/shader_view" target="_blank">Gumroad</a></p>
-
-    <img class="hero-gif" src="https://assets.superhivemarket.com/cache/a1ad4ff84b5322e25240861f0a810a2c.gif" alt="Shader View main demonstration">
-
-
-    <section class="section">
-      <div class="section-intro">
-        <h3><strong>What Shader View Does for You</strong></h3>
-        <p>
-          Shader View turns the Shader Editor into a <strong>visual map of your material</strong>.
-          Every important node gets its own preview on top, so you can instantly see how colors, masks,
-          and textures evolve across the tree — without changing any of your existing connections.
-        </p>
-      </div>
-
-      <ul class="checklist">
-        <li><span class="material-check">check_box</span><strong>Preview Each Node Result</strong> — no more plugging into Material Output.</li>
-        <li><span class="material-check">check_box</span><strong>Real-Time Updates</strong> — changes appear instantly.</li>
-        <li><span class="material-check">check_box</span><strong>Show Scalar Map (Pro)</strong> — see real numeric values instead of guessing from clamped color results.</li>
-        <li><span class="material-check">check_box</span><strong>Stay non-destructive</strong> — Shader View never touches your original .blend file.</li>
-        <li><span class="material-check">check_box</span><strong>Fast and responsive</strong> — with separate background rendering process, smart cashing and performance controls.</li>
-      </ul>
-    </section>
-
-
-    <div class="intro-gn" 
-        style="margin-top: 60px; padding: 32px; border-radius: 24px; background: #000; color:#fff;">
-
-      <h2 style="margin-bottom: 12px;" class="gradient-text">Wish Shader View existed for Geometry Nodes? Now it does.</h2>
-
-      <p style="font-size: 1.15rem; line-height: 1.7; margin-bottom: 1.5rem;">
-        Meet Preview-it™ Add-on — real-time previews for everything inside your Geometry Tree:
-        geometry shapes, field values, attribute flow, selection masks, and more.
-        All without constantly checking the viewport, wiring temporary viewers, or digging through the spreadsheet
-
-      </p>
-
-      <a href="https://superhivemarket.com/products/preview-it" target="_blank"
-        class="cta-animated-btn">
-        🔥 Limited-Time Launch: <strong>60% OFF Early Access</strong>
-      </a>
-
-    </div>
-
-    <h3><strong>Features You’ll Use Every Day</strong></h3>
-
-    <h4>Scalar Map Previews – Precision Debugging That Changes the Way You Work With Materials</h4>
-
-    <p>
-      Stop guessing what your nodes are actually outputting. <strong>Shader View Pro</strong> overlays real numerical values and a color-coded scalar grid directly on every preview — instantly revealing clamped data, negatives, overbrights, and hidden errors that normal previews completely hide.
-    </p>
-
-    <div class="video-embed">
-      <iframe src="https://www.youtube.com/embed/vtq1K-BUFYg" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-    </div>
-
-    <p>🔹 <b>Real value grid</b>  🔹 <b>Heatmap view</b> (red > 1.0, blue = negative)  🔹 <b>Live Min/Max indicators</b>  🔹 <b>Multiple analysis modes</b> (Luminance, Vector Length, Normal Dot)</p>
-
-    <div class="card-grid" style="margin-top: 60px;">
-      <div class="card">
-        <div class="card-caption"><b>Switch UDIM</b> tiles with Alt + Shift + Left Double Click</div>
-        <div class="gif-container">
-          <img src="https://assets.superhivemarket.com/cache/900bfcc9b1878108d3bec1968f7d7c73.gif" alt="UDIM switching">
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-caption"><b>Vector Splitting</b> – separate RGB/XYZ previews</div>
-        <div class="gif-container">
-          <img src="https://assets.superhivemarket.com/cache/f7d621b503d0a3bd4b765f62cb8e48ca.gif" alt="Vector splitting">
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <h4>
-        <strong>Smart Preview Masking – Never Fight Overlapping Previews Again</strong>
-      </h4>
-      <p>
-        Previews automatically mask themselves around your nodes so you can actually <em>see</em> what you’re working on. 
-        No more dragging nodes around just to read a value or spot a connection.
-      </p>
-  
-      <div class="card-grid">
-        
-        <!-- OFF Card -->
-        <div class="card" style="background: rgba(220, 50, 50, 0.15); border: 2px solid #dc3232; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(220,50,50,0.2);">
-          <div class="card-caption" style="background: #dc3232; color: #fff; font-weight: bold; padding: 16px; text-transform: uppercase; ">
-            Off – Previews Hide Your Nodes
-          </div>
-          <div class="gif-container">
-            <img 
-              src="https://assets.superhivemarket.com/cache/42318412e37486b5a1be9c63cebef356.gif" 
-              alt="Smart Preview Masking OFF – previews overlap nodes" >
-          </div>
-        </div>
-  
-        <!-- ON Card -->
-        <div class="card" style="background: rgba(0, 255, 157, 0.15); border: 3px solid #00ff9d; border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,255,157,0.25);">
-          <div class="card-caption" style="background: linear-gradient(90deg, #00ff9d, #00cc7a); color: #000; font-weight: bold; padding: 16px; text-transform: uppercase;">
-            ON – Clean, Readable Node Graph
-          </div>
-          <div class="gif-container">
-            <img 
-              src="https://assets.superhivemarket.com/cache/8be1210d9d18e372ca466afecd2e9182.gif" 
-              alt="Smart Preview Masking ON – previews are masked automatically">
-          </div>
-        </div>
-        
-      </div>
-  
-      <p>
-        One toggle → instantly cleaner workspace. Works on <strong>every</strong> preview, every time.
-      </p>
-    </div>
-
-    <h4><strong>Control Over Every Node Preview – Customize Exactly How You Need</strong></h4>
-
-    <p>Everyone’s workflow is unique. <strong>Shader View</strong> gives you full control over previews. Adjust each preview independently, ensuring the add-on works exactly the way you want.</p>
-
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-caption">Adjust previews size <b>per node</b> or <b>globally</b> – make room for details or keep your graph compact.</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/0b08eeedcae7c75c21235da33e45eb82.gif" alt="Size"></div>
-      </div>
-      <div class="card">
-        <div class="card-caption">Choose <b>any output socket</b> — color, mask, normal, factor — whatever you need to inspect.</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/e6c877bfd5e4a6ffc96f20e381f9a498.gif" alt="Socket selector"></div>
-      </div>
-    </div>
-
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-caption">Dive deep into details with zoom and pan (Alt+Shift+Hold LMB for precision control).</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/fcaff04bb93e3f3ad2af0f1d8e51fc53.gif" alt="Zoom"></div>
-      </div>
-      <div class="card">
-        <div class="card-caption"> Adjust preview <b>resolution</b> for the right balance between clarity and performance.</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/f6cf81e6056ff6ff6745a7ccb661bd69.gif" alt="Resolution"></div>
-      </div>
-    </div>
-
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-caption">Switch between <b>Plane</b> and <b>Sphere</b> preview models to match your shader type.</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/dc22d480c84655efad54f57b6b976295.gif" alt="Model"></div>
-      </div>
-      <div class="card">
-        <div class="card-caption">Switch between a <b>Perspective</b> or <b>Orthographic</b> preview camera for more accurate shading evaluation.</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/febbce4fd67f9ca4c535e1e3f08ef096.gif" alt="Camera"></div>
-      </div>
-    </div>
-
-    <p style="font-size: 1.4em; max-width: 1000px; margin: 0 auto 80px; opacity: 0.9; line-height: 1.6;">
-      <strong>Plus</strong> per-node tweaks for render samples, render engine (EEVEE/Cycles), lighting mode, and more – total flexibility without slowing you down.
-    </p>
-
-    <h3><strong>Fast, Even on Monster Node Trees</strong></h3>
-
-    <p><strong>Shader View</strong> is designed for optimal performance, even on low-end machines. It processes node output previews in a <strong>background process</strong>, ensuring smooth workflow and real-time updates. Instead of updating all nodes at once, the add-on “chunks” the node tree, so you can balance speed vs. performance to match your needs. <br><br>
-    </p>
-
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-caption">500+ Node Graphs — no lag, no crashes.</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/000ec3739d7be72232c34f7355b4fa43.gif" alt="Large tree"></div>
-        
-      </div>
-      <div class="card">
-        <div class="card-caption">Horizontal processing — updates the nearest connected nodes first for faster feedback.</div>
-        <div class="gif-container"><img src="https://assets.superhivemarket.com/cache/28c86cbb809b7c9809fdf554919a4ea6.gif" alt="Propagation"></div>
-      </div>
-    </div>
-
-    <p><b>Note for MacOS users</b>: you will see an extra bouncing Blender icon in the Dock.  
-      This is expected — the background process launches a separate Blender 
-      instance to run the EEVEE rendering environment, and macOS shows each instance 
-      as its own app.</p>
-
-
-    <h3><strong>Unlock the Full Power of Shader View</strong></h3>
-    <p>
-      Standard version gets you started with core previews. Pro version adds advanced debugging, smart tools, and pro-level customization to supercharge your workflow.
-    </p>
-
-
-    <div class="pricing-container" style="margin-top: 50px;">
-      
-      <div class="pricing-grid">
-  
-        <!-- Standard -->
-        <div class="plan-card">
-          <p class="plan-subline">One-time purchase · Lifetime updates</p>
-
-          <h3 class="plan-name">Standard</h3>
-          <p class="plan-desc">Perfect for learning, hobbyists, and light shader work</p>
-          
-          <div class="plan-price">$15</div>
-          
-  
-          <ul class="plan-list">
-            <li><span class="material-check">check</span>Real-time Multi-Node Preview</li>
-            <li><span class="material-check">check</span>Output Socket Selector</li>
-            <li><span class="material-check">check</span>Preview Customization</li>
-            <li><span class="material-check" style="color: #FFC107;">check</span>Performance Controls (Limited)</li>
-            <li><span class="material-check" style="color: #FFC107;">check</span>UDIM Support (Active Tile Only)</li>
-            <li style="line-height: 1.3;font-size: 90%;"><span class="material-check" style="color: #333;">error</span>Includes all features available in the Node Preview Add-on</li>
-          </ul>
-        </div>
-  
-        <!-- Pro -->
-        <div class="plan-card plan-pro">
-          <div class="plan-badge">👑 Most Popular</div>
-          
-          <p class="plan-subline">One-time purchase · Lifetime updates</p>
-          <h3 class="plan-name pro-name">Pro</h3>
-          <p class="plan-desc">For professional artists who demand precision debugging and maximum productivity</p>
-          
-          <div class="plan-price pro-price">$25</div>
-          
-  
-          <p class="plan-plus">Everything in Standard, <strong>plus:</strong></p>
-  
-          <ul class="plan-list">
-            <li><span class="material-check">check</span>Full Performance Controls</li>
-            <li><span class="material-check">check</span>Switch All UDIM Tiles</li>
-            <li><span class="material-check">check</span>Script Node Support</li>
-            <li><span class="material-check">check</span>Smart Preview Masking</li>
-            <li><span class="material-check">check</span>Scalar Features (Grid, Min/Max, Real Values)</li>
-            <li><span class="material-check">check</span>Vector Splitting (RGB/XYZ)</li>
-            <li><span class="material-check">check</span>Smart Zoom & Advanced Modes</li>
-          </ul>
-  
-        </div>
-  
-      </div>
-  
-    </div>
-
-    <section class="section" style="margin: 80px 0;">
-
-      <div
-        style="
-          margin: 0 auto;
-          padding: 30px 32px;
-          border-radius: 26px;
-  
-          background: linear-gradient(135deg, rgb(255 140 0 / 79%), rgb(255 94 0));
-          border: 1px solid rgba(255,140,0,0.35);
-  
-          box-shadow: 0 10px 30px rgb(255 161 161 / 22%), 0 0 55px rgba(255, 140, 0, 0.20);
-  
-          backdrop-filter: blur(6px);
-          text-align: center;
-        "
-      >
-        <!-- HEADER -->
-        <h3
-          style="
-            font-size: clamp(20px, 3vw, 26px);
-            margin: 0 0 12px;
-            background: linear-gradient(90deg, #fff9de, #e1fd42);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 25px rgba(255,140,0,0.5);
-            font-weight: 900;
-            letter-spacing: 0.4px;
-            color:#ffefae;
-          "
-        >
-          Every Purchase Supports Blender
-        </h3>
-  
-        <!-- TEXT -->
-        <p
-          style="
-            margin: 0;
-            font-size: clamp(14px, 2vw, 16px);
-            line-height: 1.7;
-            color: #fff;
-          "
-        >
-          When you purchase <span class="highlight">Shader View</span>, you’re directly helping push <span
-          style="
-            background: linear-gradient(90deg, #ffefae, #edff87);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-weight: 700;
-            color:#edff87;
-          "
-        >
-          Blender
-        </span> forward.
-          
-          
-          Part of every sale is contributed to the
-          <span
-            style="
-              background: linear-gradient(90deg, #ffefae, #edff87);
-              -webkit-background-clip: text;
-              -webkit-text-fill-color: transparent;
-              font-weight: 700;
-              color:#edff87;
-            "
-          >
-            Blender Development Fund
-          </span>, supporting the developers who keep Blender free, powerful, and open-source for all of us.
-        </p>
-      </div>
-    </section>
-    
-    <div class="intro-gn"
-        style="margin-top: 60px; padding: 32px; border-radius: 24px; background: #0a0a0f; color:#fff;">
-
-      <h2 style="margin-bottom: 12px; background: linear-gradient(135deg, #ff6b35, #ff2d95, #c77dff); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; font-weight: 900;">
-        Done with shaders? Now paint the light.
-      </h2>
-
-      <p style="font-size: 1.15rem; line-height: 1.7; margin-bottom: 1.5rem;">
-        Meet <strong>Light Painter</strong> — a brand-new way to light your scenes in Blender.
-        Paint light directly on your viewport in real time, with layers, blend modes, and full non-destructive control.
-        Stop fighting lights — shape exactly what gets lit and how, like you paint in Photoshop.
-      </p>
-
-      <div class="video-embed" style="margin: 0 0 1.5rem;">
-        <iframe src="https://www.youtube-nocookie.com/embed/S1y76nFG-4w" title="Light Painter — Paint Light in Blender" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-      </div>
-
-      <a href="https://superhivemarket.com/products/light-painter" target="_blank"
-        class="cta-animated-btn"
-        style="background: linear-gradient(90deg, #ff2d95, #c77dff); box-shadow: 0 12px 28px rgba(255, 45, 149, 0.28), 0 0 20px rgba(199, 125, 255, 0.35);">
-        Check out <strong>Light Painter</strong> →
-      </a>
-
-    </div>
-
-    <section class="section">
-
-      <h3 style="text-align: center;"><strong>FAQ</strong></h3>
-
-      <div class="faq" style="margin: clamp(32px, 6vw, 50px) auto; max-width: 780px;">
-        <details>
-          <summary>What Blender versions are supported?</summary>
-          <p>
-            Shader View is tested on Blender 3.0 through 5.x on macOS, Windows, and Linux.
-          </p>
-        </details>
-        <details>
-          <summary>Does it modify my node tree?</summary>
-          <p>
-            No. Shader View is completely non-destructive. It evaluates your node tree and draws 
-            previews on top of nodes, but it never inserts, deletes, or edits any nodes, links, or 
-            scene data.
-          </p>
-        </details>
-        <details>
-          <summary>Will it slow down Blender?</summary>
-          <p>
-            Previews are rendered in a separate background process, and the add-on uses a smart 
-            caching system to avoid unnecessary re-rendering.  
-            You can lower resolution, reduce update rate, or hide previews entirely when working 
-            on heavy scenes — so you stay fully in control of performance.
-          </p>
-        </details>
-      </div>
-    </section>
-    
-
-    
-    
-    <h3><strong>Support & Community</strong></h3>
-    <p>Bugs or questions? Reach me on <a href="https://x.com/ShaderError" target="_blank">X/Twitter</a> or join the <a href="https://discord.gg/VyUQ7Ru64B" target="_blank">Discord</a> for updates and exclusive content.</p>
-
   </div>
+
+  <div class="hero-meta"><span>BLENDER 4.x–5.x</span><i></i><span>EEVEE</span><i></i><span>CYCLES</span></div>
+
+  <div class="hero-pitch" style="text-align:center;">
+    <p>
+      <strong>Version 2.0 is a complete rewrite.</strong> <span style="font-weight:300;">It follows Blender’s real dependency graph, handles repeat zones and nested ones and suppots per-instance groups nodes, renders everything in a separate background process so the editor stays responsive.</span>
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════ 01 LIVE PREVIEWS ═══════════ -->
+<section id="previews" class="section">
+  <!-- an endless gallery of preview thumbnails flying past -->
+  
+  <div class="section-header">
+    <canvas id="gal-bg" class="gal-bg"></canvas>
+    <div class="section-badge">01 — Live Node Previews</div>
+    <h2 class="section-title">Every node gets a <span class="gt-indigo">live preview.</span></h2>
+    <p class="section-desc">
+      Open a Shader Editor and it is already there: every node has a live thumbnail that updates as you edit your material. Changes anything inside graph — nodes, reroutes, groups, or copy of a group — and all connected nodes will update automatically.
+    </p>
+  </div>
+
+  <div class="section-inner">
+    <div class="section-video">
+      <video class="section-video-media" src="https://alekseym88.github.io/shader-view-page/landing_page_1.mp4" autoplay muted loop playsinline preload="metadata" aria-label="live previews while editing a tree"></video>
+    </div>
+    <div class="feature-list">
+      <span class="feature-chip">Background render process</span>
+      <span class="feature-chip">Smart update tracking</span>
+      <span class="feature-chip">Per-node size &amp; settings</span>
+      <span class="feature-chip">EEVEE / Cycles</span>
+      <span class="feature-chip">Raw or view transform</span>
+      <span class="feature-chip">Lit or data preview</span>
+      <span class="feature-chip">Non-destructive</span>
+    </div>
+    <p class="under-desc">Per-node overrides for <strong>resolution (64–1024 px)</strong>, samples, engine and preview size — keep defaults light, crank up only the node you're inspecting. One click <strong>bakes any node's output to an image</strong>. And it's <strong>non-destructive</strong>: no permanent changes to your .blend — others can open the file without the add-on.</p>
+  </div>
+</section>
+
+<!-- ═══════════ 02 MODES ═══════════ -->
+<section id="modes" class="section">
+  <!-- wireframe plane / sphere / cube drifting behind the text -->
+  
+
+  <div class="section-header">
+    <canvas id="wf-bg" class="wire-bg"></canvas>
+    <div class="section-badge">02 — Preview Modes</div>
+    <h2 class="section-title">Plane, sphere
+<span class="gt-teal">or your actual mesh.</span></h2>
+    <p class="section-desc">
+      Switch between preview mode. Because a different texture on a different surface can give very different result.
+    </p>
+  </div>
+
+  <div class="section-inner">
+    <div class="mode-grid">
+      <div class="mode-card m-plane">
+        <span class="mode-key">Mode 1</span>
+        <h3>Plane</h3>
+        <p>Pure UV / procedural space — the texture exactly as it is baked. Zoom &amp; pan into details.</p>
+        <div class="mode-extra"><p><span class="new-badge" style="margin-left: 0;">New in 2.0</span> Set a tiling as a real 2×2 / 3×3 repetition to help your build a seamsless texture.</p></div>
+      </div>
+      <div class="mode-card m-sphere">
+        <span class="mode-key">Mode 2</span>
+        <h3>Sphere</h3>
+        <p>A lit shpere, bump and normal work — anything that depends on light or view direction. Orthographic or perspective camera per node.</p>
+      </div>
+      <div class="mode-card m-mesh">
+        <span class="mode-key">Mode 3</span>
+        <h3>Real geometry<span class="new-badge">New in 2.0</span></h3>
+        <p>The real mesh of your object — modifiers applied, scale and rotation respected. See the material on your actual model.</p>
+        <div class="mode-extra"><strong>Orbit · Pan · Zoom</strong> <p>each node will have a virtual camera, drag it right on the thumbnail.</p></div>
+      </div>
+    </div>
+    <div class="section-video" style="margin-top:16px;">
+      <video class="section-video-media" src="https://alekseym88.github.io/shader-view-page/landing_page_2.mp4" autoplay muted loop playsinline preload="metadata" aria-label="cycling plane → sphere → mesh, orbiting the camera"></video>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 03 SCALAR ═══════════ -->
+<section id="scalar" class="section">
+  <!-- scalar readouts drifting behind the text -->
+  
+  <div class="section-header">
+    <canvas id="num-bg" class="num-bg"></canvas>
+    <div class="section-badge">03 — Scalar Inspection</div>
+    <h2 class="section-title">Stop guessing. <span class="gt-orange">Measure it.</span></h2>
+    <p class="section-desc">
+      Visual previews are only half the story. ShaderView also gives you <strong>precise numerical insight</strong> into shader calculations. No more guesswork with clamped values or data ranges that are invisible as colours, every preview store the <strong>real float value</strong> of your shader node — on the plane, the sphere, or your own mesh.
+    </p>
+  </div>
+
+  <div class="section-inner">
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h3>Hover probe<span class="new-badge">New in 2.0</span></h3>
+        <p>The exact value under your cursor, live.</p>
+      </div>
+      <div class="tool-card">
+        <h3>Out-of-range</h3>
+        <p>Quickly spot values outside the 0–1 range. The preview highlights where values go above 1 or below 0, making it easy to catch problematic outputs in masks, height, bump and displacement data.</p>
+      </div>
+      <div class="tool-card">
+        <h3>Histogram<span class="new-badge">New in 2.0</span></h3>
+        <p>Distribution strip with min, max, mean and the percentage of clipped pixels — spot a mask that never reaches 1.0 in a second, crucial for height, bump and displacement maps.</p>
+      </div>
+      <div class="tool-card">
+        <h3>Heatmap<span class="new-badge">New in 2.0</span></h3>
+        <p>False-colour view (min → max with a legend) that makes subtle ranges visible where a grey preview shows nothing.</p>
+      </div>
+      <div class="tool-card">
+        <h3>Threshold contour<span class="new-badge">New in 2.0</span></h3>
+        <p>Click the preview — the value under the cursor becomes the threshold and its contour line is drawn. Hold and move to scrub the threshold live.</p>
+      </div>
+      <div class="tool-card">
+        <h3>Vector split</h3>
+        <p>Preview X / Y / Z of a vector separately; reduce vectors and colours to a number by <code>Luma</code> (luminance), <code>Vector Length</code> (great for displacement / normal debugging) or <code>Normal Dot</code> (shading analysis).</p>
+      </div>
+    </div>
+
+    <div class="section-video" style="margin-top:16px;">
+      <video class="section-video-media" src="https://alekseym88.github.io/shader-view-page/landing_page_3.mp4" autoplay muted loop playsinline preload="metadata" aria-label="scalar inspection: probe, out-of-range, histogram, heatmap, contour"></video>
+    </div>
+
+    <div class="callout">
+      <strong>Why this matters:</strong> for procedural textures, displacement maps and mathematical shaders, understanding the real values behind the visuals is essential. Debug precisely by detecting clamping or missing detail, improve accuracy by knowing the exact value distribution, and fix problematic areas in seconds instead of "tweaking until it looks right".
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 04 UV ═══════════ -->
+<section id="uv" class="section">
+  <!-- UV islands drifting in and out of the 0-1 square -->
+  <canvas id="uv-bg" class="uv-bg"></canvas>
+
+  <div class="section-header">
+    <div class="section-badge">04 — UV Tools</div>
+    <h2 class="section-title"><span class="gt-teal">Inspect your UVs.</span></h2>
+    <p class="section-desc">See the exact coordinates your shader is using, after Mapping, warping and other transformations — directly on the node, with your material still fully connected.</p>
+  </div>
+
+  <div class="section-inner">
+    <div class="uv-grid">
+      <div class="tool-card">
+        <h3>Coordinate Checker<span class="new-badge">New in 2.0</span></h3>
+        <p>A grid driven by this node's output as a coordinate — after every Mapping, warp and piece of vector math.</p>
+        <div class="tool-opts">
+          <p><b>Color Grid or plain squares.</b> Rotation and mirroring stay visible; a symmetric checker hides both.</p>
+        </div>
+      </div>
+      <div class="tool-card">
+        <h3>UV Space<span class="new-badge">New in 2.0</span></h3>
+        <p>The evaluated mesh flattened into its UV layout, with the live shader drawn across it.</p>
+        <div class="tool-opts">
+          <p>The 0–1 square is always framed, and islands that escaped it stay visible.</p>
+        </div>
+      </div>
+      <div class="tool-card">
+        <h3>Stretch<span class="new-badge">New in 2.0</span></h3>
+        <p>Is the coordinate even across the surface? Measured per unit of real surface — not the UV map underneath it.</p>
+        <div class="tool-opts">
+          <p><b>Density.</b> Blue where the pattern smears, red where it crowds, with the real multiples on the legend.</p>
+          <p><b>Anisotropy.</b> Shape, not area: a coordinate passing density at ×1.03 can still be 30:1 slivers.</>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-video" style="margin-top:16px;">
+      <video class="section-video-media" src="https://alekseym88.github.io/shader-view-page/landing_page_4.mp4" autoplay muted loop playsinline preload="metadata" aria-label="UV tools: coordinate checker, UV space, stretch"></video>
+    </div>
+
+    <div class="callout">
+      <strong>Why this matters:</strong> UV problems are the ones that survive all the way to the render stage. A stretched island, a mirrored one stacked on top of another — none of them look wrong in the shader editor, and all of them look wrong in the final result. ShaderView 2.0 puts the answer on the node you're already looking at.
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 05 FOCUS ═══════════ -->
+<section id="focus" class="section">
+  <!-- fractal trees growing behind the text -->
+  <canvas id="frac-bg" class="frac-bg"></canvas>
+
+  <div class="section-header">
+    <div class="section-badge">05 — Stay Focused</div>
+    <h2 class="section-title">Big trees. <span class="gt-indigo">Less visual noise.</span></h2>
+    <p class="section-desc">
+      A hundred thumbnails shouldn't feel like a hundred distractions. ShaderView keeps the tree readable — and the parts you care about in sight.
+    </p>
+  </div>
+
+  <div class="section-inner">
+    <div class="tool-grid">
+      <div class="tool-card">
+        <h3>Pin previews<span class="new-badge">New in 2.0</span></h3>
+        <p>Pin any thumbnail to the viewport — it stays on screen (and keeps updating!) while you work at the other end of the tree.</p>
+      </div>
+      <div class="tool-card">
+        <h3>Solo &amp; fade<span class="new-badge">New in 2.0</span></h3>
+        <p>Select a node and unrelated previews fade out — only its chain stays at full opacity.</p>
+      </div>
+      <div class="tool-card">
+        <h3>Arrange nodes<span class="new-badge">New in 2.0</span></h3>
+        <p>One click lays the tree out in clean columns — and it's the only auto-layout that accounts for each node's <em>preview footprint</em>, so thumbnails never overlap. Turn on <strong>Add Reroutes</strong> and long links run along a clean horizontal lane, with everything leaving the same socket sharing one reroute — the bus you'd have built by hand. Reroutes you labelled, and rails you grouped into their own frame, are left exactly as they are.</p>
+      </div>
+    </div>
+    <div class="section-video" style="margin-top:16px;">
+      <video class="section-video-media" src="https://alekseym88.github.io/shader-view-page/landing_page_5.mp4" autoplay muted loop playsinline preload="metadata" aria-label="pinned previews + fade unrelated + arrange"></video>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- ═══════════ V1 → V2 ═══════════ -->
+<section id="compare" class="section">
+  <!-- the original banner effect, recoloured neon, now living here -->
+  <canvas id="cmp-bg" class="cmp-bg"></canvas>
+
+  <div class="section-header">
+    <div class="section-badge">1.x → 2.0</div>
+    <h2 class="section-title">Everything you know.<br><span class="gt-indigo">A lot more underneath.</span></h2>
+    <p class="section-desc">
+      Version 2.0 keeps the workflow you already know, but adds a whole new toolkit for inspecting and debugging your shaders.
+    </p>
+  </div>
+
+  <div class="section-inner">
+    <div class="cmp">
+      <div class="cmp-head">
+        <div class="c-feat">Feature</div>
+        <div class="c-v1">Version 1.x</div>
+        <div class="c-v2">Version 2.0</div>
+      </div>
+      <div class="cmp-group">Previews</div>
+      <div class="cmp-row">
+        <div class="c-feat">Live preview on every node<small>background render process, auto-sync</small></div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Preview object</div>
+        <div class="c-v1"><span class="cmp-txt">Plane · Sphere</span></div>
+        <div class="c-v2"><span class="cmp-txt-2">+ your real mesh</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Preview camera<small>orbit / pan / dolly on the thumbnail</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Per-node size, zoom, resolution, samples, engine</div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="cmp-txt-2">direct fields</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Smart preview masking<small>z-order aware, never covers nodes</small></div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Pin &amp; solo previews<small>keep a thumbnail on screen anywhere in the tree</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Fade unrelated previews<small>only the selected node's chain stays lit</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-group">Reading the values</div>
+      <div class="cmp-row">
+        <div class="c-feat">Value grid &amp; min / max<small>real floats, above 1.0 and below 0</small></div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Scalar modes<small>Luma · Vector Length · Normal Dot</small></div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Vector split (X / Y / Z)</div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Hover probe<small>exact value under the cursor, live</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Histogram<small>min / max / mean / clipped %</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Heatmap<small>false colour with legend</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Threshold contour<small>click the preview to pick the value</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Values on sphere &amp; mesh<small>value pass renders on the preview object</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+
+      <div class="cmp-group">UV &amp; coordinates</div>
+      <div class="cmp-row">
+        <div class="c-feat">Coordinate Checker<small>node's output used as a coordinate</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Color Grid pattern<small>rotation and mirroring become visible</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">UV-space preview<small>live shader on the flattened layout, 0–1 framed</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Coordinate density<small>per unit of real surface, foreshortening corrected</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Anisotropy<small>shape distortion, not just area</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      
+      <div class="cmp-group">Node trees</div>
+      <div class="cmp-row">
+        <div class="c-feat">Node groups</div>
+        <div class="c-v1"><span class="cmp-txt">basic</span></div>
+        <div class="c-v2"><span class="cmp-txt-2">per instance</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Repeat zones<small>including nested zones</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">New Blender node types<small>rebuilt on the real dependency graph</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">UDIM tiles</div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Tiling check<small>2×2 / 3×3 repetition to spot seams</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Arrange nodes<small>layout that accounts for every thumbnail</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Bake output to image<small>512 – 4096 px, into your .blend</small></div>
+        <div class="c-v1"><span class="no">—</span></div>
+        <div class="c-v2"><span class="yes2">✓</span></div>
+      </div>
+      <div class="cmp-group">Workflow &amp; performance</div>
+      <div class="cmp-row">
+        <div class="c-feat">Side panel &amp; pop-overs</div>
+        <div class="c-v1"><span class="cmp-txt">menus</span></div>
+        <div class="c-v2"><span class="cmp-txt-2">redesigned UI</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Heavy trees (1000+ nodes)</div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+      <div class="cmp-row">
+        <div class="c-feat">Non-destructive .blend<small>opens fine without the add-on</small></div>
+        <div class="c-v1"><span class="yes">✓</span></div>
+        <div class="c-v2"><span class="yes">✓</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="callout" style="margin-top:20px;">
+  <strong>Already own 1.x?</strong> You can upgrade to 2.0 by paying only the difference.
+  Your existing licence stays in your <strong>Superhive</strong> account, and version 1.x
+  remains downloadable and fully usable — nothing is removed and nothing expires.
+  And if you prefer to buy the older version, ShaderView 1.x will stay on
+  <strong><a href="https://shadererror.gumroad.com/l/shader_view" target="_blank" style="color: var(--accent);">Gumroad</a></strong> permanently with <strong>50% off</strong>.
+</div>
+
+<!-- ═══════════ FAQ ═══════════ -->
+<section id="faq" class="faq">
+  <div class="section-badge">FAQ</div>
+  <h2 class="section-title">Questions, <span class="gt-indigo">answered.</span></h2>
+  <div class="faq-list">
+    <details>
+      <summary>What Blender versions are supported?</summary>
+      <p>Shader View is tested on Blender 3.0 through 5.x on macOS, Windows, and Linux.</p>
+    </details>
+    <details>
+      <summary>Does it modify my node tree?</summary>
+      <p>No. Shader View is completely non-destructive. It evaluates your node tree and draws previews on top of nodes, but it never inserts, deletes, or edits any nodes, links, or scene data.</p>
+    </details>
+    <details>
+      <summary>Will it slow down Blender?</summary>
+      <p>Previews are rendered in a separate background process, and the add-on uses a smart caching system to avoid unnecessary re-rendering. You can lower resolution, reduce update rate, or hide previews entirely when working on heavy scenes — so you stay fully in control of performance.</p>
+    </details>
+  </div>
+</section>
+
+<!-- ═══════════ CTA ═══════════ -->
+
+<section class="human-made">
+  <h3>Built by a human, for humans.</h3>
+  <p>ShaderView is made by real person by real coding for people who still wanna spend their days making things in Blender by own hands. But this HTML page, however, done with some help from AI.</p>
+  <p><a href="https://x.com/ShaderError" target="_blank">@ShaderError</a></p>
+</section>
+
+
+<div class="lp-card">
+  <h2>Done with shaders?</h2>
+  <p>
+    Meet <strong>Light Painter</strong> — a brand-new way to light your scenes in Blender.
+    Paint light directly on your viewport in real time, with layers, blend modes, and full non-destructive control.
+    Stop fighting lights — shape exactly what gets lit and how, like you paint in Photoshop.
+  </p>
+  <div class="video-embed">
+    <iframe src="https://www.youtube-nocookie.com/embed/S1y76nFG-4w" title="Light Painter — Paint Light in Blender" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
+  <a href="https://superhivemarket.com/products/light-painter" target="_blank" rel="noopener" class="cta-animated-btn">
+    Check out <strong>Light Painter</strong> →
+  </a>
+</div>
+
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────
+// WebGL shader accents — each canvas runs a small procedural texture,
+// the very thing the add-on previews: noise, voronoi, waves, cells.
+// Light-theme palette, gentle motion, cheap fragment shaders.
+// ─────────────────────────────────────────────────────────────────────────
+(function(){
+  try {
+    var _t = document.createElement('canvas').getContext('webgl');
+    if (!_t) document.documentElement.classList.add('no-webgl');
+  } catch(e){ document.documentElement.classList.add('no-webgl'); }
+  var VS = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+  var COMMON =
+    'precision mediump float;uniform vec2 R;uniform float T;' +
+    'vec2 h2(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return fract(sin(p)*43758.5453);}' +
+    'float n2(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);' +
+    'float a=dot(h2(i),vec2(1.)),b=dot(h2(i+vec2(1,0)),vec2(1.)),c=dot(h2(i+vec2(0,1)),vec2(1.)),d=dot(h2(i+vec2(1,1)),vec2(1.));' +
+    'return mix(mix(a,b,u.x),mix(c,d,u.x),u.y)*0.5;}' +
+    'float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*n2(p);p*=2.03;a*=.5;}return v;}';
+
+  // resScale: render the canvas at a FRACTION of its CSS size and let the
+  // browser scale it up. These are soft, out-of-focus backgrounds — nobody
+  // can see the difference, and it cuts the fragment count by 1/s² on the
+  // heavy full-width ones.
+  function run(id, frag, maskFrom, maskBlur, resScale){
+    var c = document.getElementById(id);
+    if (!c) return;
+    var gl = c.getContext('webgl', {alpha:true, premultipliedAlpha:false});
+    if (!gl) return;
+    function sh(t,s){var o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);return o;}
+    var pr = gl.createProgram();
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS));
+    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, COMMON + frag));
+    gl.linkProgram(pr);
+    if(!gl.getProgramParameter(pr, gl.LINK_STATUS)) return;
+    gl.useProgram(pr);
+    var b = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, b);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+    var lp = gl.getAttribLocation(pr,'p');
+    gl.enableVertexAttribArray(lp);
+    gl.vertexAttribPointer(lp,2,gl.FLOAT,false,0,0);
+    var uR = gl.getUniformLocation(pr,'R'), uT = gl.getUniformLocation(pr,'T');
+
+    // optional text mask (Light Painter approach): rasterise a DOM element's
+    // text into a texture aligned with this canvas so the shader can react
+    // to the actual glyphs (refract around them, shadow them, glow them)
+    var uM = gl.getUniformLocation(pr,'M'), uHM = gl.getUniformLocation(pr,'HM');
+    var maskTex = null, mCan = null, mCtx = null, maskOK = false, maskKey = '';
+    if (maskFrom){
+      mCan = document.createElement('canvas');
+      mCtx = mCan.getContext('2d');
+      maskTex = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, maskTex);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0,0]));
+    }
+    function buildMask(force){
+      if (!mCan) return;
+      var el = document.getElementById(maskFrom);
+      if (!el) return;
+      var cr = c.getBoundingClientRect(), er = el.getBoundingClientRect();
+      if (!cr.width || !cr.height || !er.width){ maskOK = false; return; }
+      var key = [c.width, c.height, Math.round(er.left-cr.left), Math.round(er.top-cr.top),
+                 Math.round(er.width), el.textContent.trim()].join('|');
+      if (!force && key === maskKey && maskOK) return;
+      maskKey = key;
+      var scale = c.width / cr.width;
+      mCan.width = c.width; mCan.height = c.height;
+      mCtx.clearRect(0,0,mCan.width,mCan.height);
+      var cs = getComputedStyle(el);
+      mCtx.font = cs.fontWeight + ' ' + (parseFloat(cs.fontSize)*scale) + 'px ' + cs.fontFamily;
+      try { mCtx.letterSpacing = (parseFloat(cs.letterSpacing)*scale || 0) + 'px'; } catch(e){}
+      mCtx.textAlign = 'center'; mCtx.textBaseline = 'middle';
+      mCtx.fillStyle = '#fff';
+      var cx = (er.left-cr.left + er.width/2) * scale;
+      var cy = (er.top-cr.top + er.height/2) * scale;
+      var blurPx = Math.max(1, Math.round(mCan.height * (maskBlur != null ? maskBlur : 0.015)));
+      var txt = el.textContent.trim();
+      try { mCtx.filter = 'blur(' + blurPx + 'px)'; } catch(e){}
+      mCtx.fillText(txt, cx, cy);
+      try { mCtx.filter = 'blur(' + Math.max(1, Math.round(blurPx*0.35)) + 'px)'; } catch(e){}
+      mCtx.fillText(txt, cx, cy);
+      try { mCtx.filter = 'none'; } catch(e){}
+      gl.bindTexture(gl.TEXTURE_2D, maskTex);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, mCan);
+      maskOK = true;
+    }
+    if (maskFrom && document.fonts && document.fonts.ready)
+      document.fonts.ready.then(function(){ buildMask(true); });
+
+    // adaptive resolution: measure how long frames actually take on THIS
+    // machine and trade pixels for smoothness. Crisp on a fast GPU, still
+    // 60fps on a weak one — nobody sees the resolution change on a
+    // out-of-focus background.
+    var dyn = 1.0, fAcc = 0, fCnt = 0, fLast = 0;
+
+    var vis = true, tick = 0;
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function(e){ vis = e[0].isIntersecting; }).observe(c);
+    }
+    function frame(t){
+      requestAnimationFrame(frame);
+      if (!vis) return;
+      if (fLast) { fAcc += (t - fLast); fCnt++; }
+      fLast = t;
+      if (fCnt >= 18) {
+        var avg = fAcc / fCnt; fAcc = 0; fCnt = 0;
+        if (avg > 20 && dyn > 0.34) dyn = Math.max(0.34, dyn - 0.16);
+        else if (avg < 14 && dyn < 1) dyn = Math.min(1, dyn + 0.07);
+      }
+      // scale WITH the display: on a retina screen a canvas sized in CSS
+      // pixels is upscaled 2x by the browser, which is what made these look
+      // pixelated. Soft backgrounds pass a fraction; crisp ones pass ~1.
+      var rs = (resScale || 1) * Math.min(window.devicePixelRatio || 1, 1.75) * dyn;
+      var w = Math.max(1, Math.round(c.clientWidth * rs));
+      var h = Math.max(1, Math.round(c.clientHeight * rs));
+      if (c.width !== w || c.height !== h){ c.width = w; c.height = h; gl.viewport(0,0,w,h); buildMask(true); }
+      if (mCan && (++tick % 30 === 0 || !maskOK)) buildMask(false);
+      gl.uniform2f(uR, w, h);
+      gl.uniform1f(uT, t*0.001);
+      if (maskTex){
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, maskTex);
+        if (uM) gl.uniform1i(uM, 0);
+        if (uHM) gl.uniform1f(uHM, maskOK ? 1.0 : 0.0);
+      }
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  // The banner effect, kept alive behind the v1 → v2 table: iq domain-warping
+  // fBM with a cool-neon ramp (deep indigo → violet → cyan → white), drawn as
+  // glow on transparent so the dark page reads through it.
+  run('cmp-bg',
+    'float rnd2(vec2 n){return fract(sin(dot(n,vec2(12.9898,4.1414)))*43758.5453);}'+
+    'float nz(vec2 p){vec2 ip=floor(p);vec2 u=fract(p);u=u*u*(3.-2.*u);'+
+    'float res=mix(mix(rnd2(ip),rnd2(ip+vec2(1.,0.)),u.x),mix(rnd2(ip+vec2(0.,1.)),rnd2(ip+vec2(1.,1.)),u.x),u.y);'+
+    'return res*res;}'+
+    'float wfbm(vec2 p){const mat2 mtx=mat2(.8,.6,-.6,.8);float f=0.;float tt=T*.22;'+
+    'f+=.500000*nz(p+tt);p=mtx*p*2.02;'+
+    'f+=.031250*nz(p-tt*.6);p=mtx*p*2.01;'+
+    'f+=.250000*nz(p);p=mtx*p*2.03;'+
+    'f+=.125000*nz(p+tt*.35);p=mtx*p*2.01;'+
+    'f+=.062500*nz(p);p=mtx*p*2.04;'+
+    'f+=.015625*nz(p+sin(tt*.8));'+
+    'return f/.96875;}'+
+    'float pattern(vec2 p){return wfbm(p+1.4*wfbm(p+1.1*wfbm(p+vec2(0.,T*.03))));}'+
+    // cool-neon ramp: indigo -> violet -> cyan -> white
+    'vec3 ramp(float x){x=clamp(x,0.,1.);'+
+    'vec3 a=vec3(.10,.08,.34),b=vec3(.44,.30,1.),c=vec3(.74,.36,1.),'+
+    'd=vec3(.20,.95,1.),e=vec3(.96,.99,1.);'+
+    'if(x<.30)return mix(a,b,x/.30);'+
+    'if(x<.56)return mix(b,c,(x-.30)/.26);'+
+    'if(x<.82)return mix(c,d,(x-.56)/.26);'+
+    'return mix(d,e,(x-.82)/.18);}'+
+    'void main(){vec2 uv=gl_FragCoord.xy/R.x;'+
+    'float x=pattern(uv*2.2);'+
+    'vec3 col=ramp(x);'+
+    // alpha follows the pattern so the darkest troughs stay transparent
+    'float a=smoothstep(.10,.62,x);'+
+    // clear a soft corridor down the middle so the headline stays crisp
+    'vec2 sc=gl_FragCoord.xy/R;'+
+    'float cen=smoothstep(.0,.40,abs(sc.x-.5));'+
+    'a*=mix(.28,1.,cen);'+
+    'gl_FragColor=vec4(col*a*1.3,a*.88);}',
+    null, null, 0.5);
+
+
+
+  // 05 — "The Universe Within" (BigWings), recoloured: every CONNECTION and
+  // every node carries its own hue (hashed from the pair, drifting slowly)
+  // instead of the whole field cycling through one colour together.
+  run('frac-bg',
+    '\n#define S2(a,b,t) smoothstep(a,b,t)\n'+
+    'float N21(vec2 p){vec3 a=fract(vec3(p.xyx)*vec3(213.897,653.453,253.098));'+
+    'a+=dot(a,a.yzx+79.76);return fract((a.x+a.y)*a.z);}'+
+    // fixed 5-stop neon set — hashes land ON a swatch, so links read as
+    // distinct colours rather than a continuous rainbow smear
+    'vec3 SW(int i){if(i==0)return vec3(.49,.42,1.);if(i==1)return vec3(.12,.83,.67);'+
+    'if(i==2)return vec3(1.,.57,.32);if(i==3)return vec3(.89,.39,.94);return vec3(.38,.72,1.);}'+
+    'vec3 swatch(float h){h=fract(h);int i=int(floor(h*5.));'+
+    'if(i==0)return SW(0);if(i==1)return SW(1);if(i==2)return SW(2);if(i==3)return SW(3);return SW(4);}'+
+    // each link keeps its swatch and only breathes in brightness
+    'vec3 linkCol(float seed,float t){vec3 c=swatch(seed);'+
+    'float b=.72+.38*sin(t*.55+seed*24.0);return c*b;}'+
+    'vec2 GetPos(vec2 id,vec2 offs,float t){float n=N21(id+offs);float n1=fract(n*10.);float n2=fract(n*100.);'+
+    'float a=t+n;return offs+vec2(sin(a*n1),cos(a*n2))*.4;}'+
+    'float df_line(vec2 a,vec2 b,vec2 p){vec2 pa=p-a,ba=b-a;'+
+    'float h=clamp(dot(pa,ba)/dot(ba,ba),0.,1.);return length(pa-ba*h);}'+
+    'float line_(vec2 a,vec2 b,vec2 uv){float r1=.04;float r2=.01;'+
+    'float d=df_line(a,b,uv);float d2=length(a-b);float fade=S2(1.5,.5,d2);'+
+    'fade+=S2(.05,.02,abs(d2-.75));return S2(r1,r2,d)*fade;}'+
+    'vec3 NetLayer(vec2 st,float n,float t){vec2 id=floor(st)+n;st=fract(st)-.5;'+
+    'vec2 p4=GetPos(id,vec2(0.,0.),t);vec3 m=vec3(0.);vec3 sparkle=vec3(0.);'+
+    'for(float y=-1.;y<=1.;y++){for(float x=-1.;x<=1.;x++){'+
+    'vec2 q=GetPos(id,vec2(x,y),t);'+
+    // hue seed from the two endpoints -> this LINK's own colour
+    'float sd=N21(id*1.7+vec2(x,y)*3.31+n*11.0);'+
+    'm+=line_(p4,q,st)*linkCol(sd,t);'+
+    'float d=length(st-q);float s=(.005/(d*d));s*=S2(1.,.7,d);'+
+    'float pulse=sin((fract(q.x)+fract(q.y)+t)*5.)*.4+.6;pulse=pow(pulse,20.);s*=pulse;'+
+    'sparkle+=s*linkCol(fract(sd+.37),t);}}'+
+    'vec2 p1=GetPos(id,vec2(0.,-1.),t);vec2 p3=GetPos(id,vec2(-1.,0.),t);'+
+    'vec2 p5=GetPos(id,vec2(1.,0.),t);vec2 p7=GetPos(id,vec2(0.,1.),t);'+
+    'm+=line_(p1,p3,st)*linkCol(N21(id+vec2(3.1,7.7)+n),t);'+
+    'm+=line_(p1,p5,st)*linkCol(N21(id+vec2(5.3,1.9)+n),t);'+
+    'm+=line_(p7,p5,st)*linkCol(N21(id+vec2(9.7,4.2)+n),t);'+
+    'm+=line_(p7,p3,st)*linkCol(N21(id+vec2(2.4,8.6)+n),t);'+
+    'float sPhase=(sin(t+n)+sin(t*.1))*.25+.5;sPhase+=pow(sin(t*.1)*.5+.5,50.)*5.;'+
+    'm+=sparkle*sPhase;return m;}'+
+    'void main(){vec2 uv=(gl_FragCoord.xy-R*.5)/R.y;'+
+    'float t=T*.1;'+
+    'float s=sin(t);float c=cos(t);mat2 rot=mat2(c,-s,s,c);'+
+    'vec2 st=uv*rot;'+
+    'vec3 m=vec3(0.);'+
+    'for(float i=0.;i<1.;i+=.25){float z=fract(t+i);float size=mix(15.,1.,z);'+
+    'float fade=S2(0.,.6,z)*S2(1.,.8,z);m+=fade*NetLayer(st*size,i,T);}'+
+    'float vig=1.-dot(uv,uv);'+
+    'vec3 col=m*vig;'+
+    'float a=clamp(max(max(col.r,col.g),col.b),0.,1.);'+
+    'gl_FragColor=vec4(col*.95,a*.92);}',
+    null, null, 0.5);
+
+  // 04 — UV TOOLS: a real UV parameterisation wrapped around a shape.
+  // A wobbling torus is raymarched and textured with the checker of its OWN
+  // (u, v) — u around the ring, v around the tube — so you can watch the
+  // squares stretch on the outside of the ring and pinch on the inside. The
+  // tint is the add-on's stretch encoding on the analytic texel density
+  // (blue = stretched, grey = on target, red = squeezed) and the orange line
+  // is the u = 0 seam. The headline sits in the hole of the torus.
+  run('uv-bg',
+    'mat2 rr(float a){float c=cos(a),s=sin(a);return mat2(c,-s,s,c);}'+
+    'vec3 warp(vec3 p,float t){p.yz=rr(0.62)*p.yz;p.xz=rr(t)*p.xz;return p;}'+
+    // how many times the ribbon screws around the ring. It drifts between
+    // WHOLE turns and lingers on them, so the shape closes on itself most of
+    // the time and only creases briefly while it morphs to the next count.
+    'float TWI(float t){float raw=3.0+2.0*sin(t*0.22);'+
+    'return mix(floor(raw),floor(raw)+1.0,smoothstep(0.30,0.70,fract(raw)));}'+
+    // wobbling major radius + a tube that swells and pinches around the ring
+    'float RAD(vec3 q,float t){float a=atan(q.z,q.x);'+
+    'return 1.62+0.15*sin(a*3.0+t*1.6)+0.07*sin(a*5.0-t*1.1);}'+
+    'float TUB(float a,float t){return 0.46+0.11*sin(a*2.0+t*1.3);}'+
+    'const float EY=0.56;'+          // flat cross-section -> the screw is visible
+    'float map(vec3 p,float t){vec3 q=warp(p,t);'+
+    'float a=atan(q.z,q.x);float Rr=RAD(q,t);'+
+    'vec2 w=vec2(length(q.xz)-Rr,q.y);'+
+    'w=rr(TWI(t)*a+t*0.9)*w;'+       // <- the screw
+    'w.y/=EY;'+
+    'return (length(w)-TUB(a,t))*EY;}'+
+    'vec3 nrm(vec3 p,float t){vec2 e=vec2(0.0022,0.);'+
+    'return normalize(vec3(map(p+e.xyy,t)-map(p-e.xyy,t),'+
+    'map(p+e.yxy,t)-map(p-e.yxy,t),map(p+e.yyx,t)-map(p-e.yyx,t)));}'+
+    'vec3 heat(float k){k=clamp(k,0.,1.);'+
+    'vec3 lo=vec3(.16,.38,1.),mid=vec3(.74,.77,.88),hi=vec3(1.,.30,.16);'+
+    'return k<.5?mix(lo,mid,k*2.):mix(mid,hi,(k-.5)*2.);}'+
+    'void main(){vec2 uv=(gl_FragCoord.xy-R*.5)/R.y;'+
+    'uv.y-=0.16;'+                   // lift the ring so its hole frames the headline
+    'float t=T*.16;'+
+    'vec3 ro=vec3(0.,0.,6.2);'+
+    'vec3 rd=normalize(vec3(uv*1.86,-2.6));'+
+    'float d=0.,hit=0.;vec3 pos=ro;'+
+    'for(int i=0;i<96;i++){pos=ro+rd*d;float s=map(pos,t);'+
+    'if(s<0.0035){hit=1.;break;}d+=s*0.70;if(d>11.)break;}'+
+    'if(hit<.5){gl_FragColor=vec4(0.);return;}'+
+    'vec3 n=nrm(pos,t);'+
+    'vec3 q=warp(pos,t);'+
+    'float ang=atan(q.z,q.x);float Rr=RAD(q,t);'+
+    // the surface's own UV: u around the ring, v around the SCREWED cross-section
+    'float u=ang/6.2831853+0.5;'+
+    'vec2 w=rr(TWI(t)*ang+t*0.9)*vec2(length(q.xz)-Rr,q.y);'+
+    'float th=atan(w.y/EY,w.x);'+
+    'float v=th/6.2831853+0.5;'+
+    'float NU=34.,NV=9.;'+
+    'float ch=mod(floor(u*NU)+floor(v*NV),2.0);'+
+    // texel density along u is just how far the point sits from the ring axis
+    'float st=length(q.xz)/Rr;'+
+    'float k=clamp(0.5+log2(max(st,0.05))*1.35,0.,1.);'+
+    'vec3 tint=heat(k);'+
+    'vec3 col=mix(tint*0.13,tint,ch);'+
+    // the u = 0 seam, where the wrap closes
+    'float seam=smoothstep(0.013,0.,abs(fract(u+0.5)-0.5));'+
+    'col=mix(col,vec3(1.,.62,.18),seam*0.92);'+
+    'float dif=clamp(dot(n,normalize(vec3(.55,.8,.45)))*.5+.5,0.,1.);'+
+    'float rim=pow(1.-clamp(dot(n,-rd),0.,1.),2.6);'+
+    'col*=0.34+0.92*dif;'+
+    'col+=vec3(.22,.55,1.)*rim*.42;'+
+    'float a=0.92-0.30*smoothstep(6.,10.,d);'+
+    'float cen=smoothstep(0.0,0.40,abs(uv.x));'+
+    'a*=mix(0.34,1.,cen);'+
+    'a*=smoothstep(-0.62,-0.18,uv.y)*0.35+0.65;'+
+    'gl_FragColor=vec4(col*a,a);}',
+    null, null, 0.5);
+
+  // 01 — an endless gallery of node previews flying past. Three depth layers
+  // of a scrolling card grid; each card picks ONE of eight cheap procedural
+  // effects from a hash of its cell id, so every thumbnail shows something
+  // different and nothing is ever stored or repeated. Only the front-most
+  // card at a fragment evaluates its effect, so the cost is ~one procedural
+  // texture per pixel no matter how many cards are on screen.
+  run('gal-bg',
+    // fbm from COMMON lands in 0..0.5 — normalise it once
+    'float FB(vec2 p){return clamp(fbm(p)*2.0,0.,1.);}'+
+    // Twelve procedural families, one per card, picked from the cell hash.
+    // Each is also parameterised BY that hash (scale, ring count, palette
+    // phase, drop size...) so two cards of the same family never match, and
+    // the caller rotates and zooms the local uv per card on top of that.
+    // well-distributed hash — a sin() one bands, and neighbouring cards kept
+    // drawing the same family
+    'float H21(vec2 p){vec3 a=fract(vec3(p.xyx)*vec3(213.897,653.453,253.098));'+
+    'a+=dot(a,a.yzx+79.76);return fract((a.x+a.y)*a.z);}'+
+    // cheap Rodrigues hue rotation about the grey axis
+    'vec3 hue(vec3 c,float a){const vec3 k=vec3(0.57735);float cs=cos(a);'+
+    'return clamp(c*cs+cross(k,c)*sin(a)+k*dot(k,c)*(1.-cs),0.,1.);}'+
+    'vec3 gfx(float fam,float sd,vec2 p,float t){'+
+    'float k=floor(fam*16.0);'+
+    // every family samples its noise from a seeded offset, so two cards of the
+    // same family are different PATTERNS, not just the same pattern retinted
+    'vec2 so=vec2(sd*137.13,fract(sd*7.77)*211.71);'+
+    // 0 — domain-warped fire
+    'if(k<1.){vec2 w=p*2.6+so+vec2(0.,-t*0.5);'+
+    'float q1=FB(w+vec2(0.,t*0.3));'+
+    'float f=pow(FB(w+vec2(q1*1.3,q1*0.9-t*0.25)),1.2)*1.3;'+
+    'vec3 c=mix(vec3(.11,.03,.04),vec3(.82,.12,.03),smoothstep(.06,.42,f));'+
+    'c=mix(c,vec3(1.,.62,.10),smoothstep(.42,.72,f));'+
+    'return mix(c,vec3(1.,.96,.78),smoothstep(.72,.96,f));}'+
+    // 1 — voronoi crystal: F2-F1 gives the cell WALLS, not just the cells
+    'if(k<2.){vec2 g=p*(3.+sd*3.)+so;vec2 i2=floor(g),f2=fract(g);'+
+    'float d1=8.,d2=8.;'+
+    'for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 o=vec2(float(x),float(y));'+
+    'vec2 r=h2(i2+o);r=.5+.5*sin(t*.4+6.2831*r);float d=length(o+r-f2);'+
+    'if(d<d1){d2=d1;d1=d;}else if(d<d2){d2=d;}}'+
+    'float e=smoothstep(.0,.15,d2-d1);'+
+    'return mix(vec3(.82,.99,.94),mix(vec3(.05,.16,.15),vec3(.10,.64,.56),d1),e);}'+
+    // 2 — marble with sharp veins
+    'if(k<3.){float tb=FB(p*2.2+so);'+
+    'float v=pow(1.-abs(sin((p.x*1.4+p.y*.6+tb*2.4)*(9.+sd*7.)+t*.4)),3.5);'+
+    'vec3 c=mix(vec3(.05,.05,.13),vec3(.30,.26,.62),FB(p*1.3+so*.7));'+
+    'return mix(c,vec3(.92,.90,1.),v);}'+
+    // 3 — checker pushed around by a flow field
+    'if(k<4.){float a=FB(p*1.8+so+t*.12)*6.2831;'+
+    'vec2 q=p+vec2(cos(a),sin(a))*.22;float n=4.+floor(sd*5.);'+
+    'float c=mod(floor(q.x*n)+floor(q.y*n),2.);'+
+    'return mix(vec3(.14,.06,.18),vec3(.88,.38,.95),c)*(.72+.55*FB(q*6.+so));}'+
+    // 4 — interference rings (two beating centres)
+    'if(k<5.){vec2 a=vec2(.30+sd*.25,.42),b=vec2(.72,.58-sd*.25);'+
+    'float w=(sin(length(p-a)*(22.+sd*18.)-t*1.1)*sin(length(p-b)*(26.-sd*11.)+t*.8))*.5+.5;'+
+    'return mix(vec3(.03,.05,.12),vec3(.34,.72,1.),pow(w,1.8));}'+
+    // 5 — wood grain
+    'if(k<6.){vec2 q=(p-.5)*vec2(1.,.30+sd*.45);'+
+    'float g=fract(length(q)*(9.+sd*7.)+FB(p*3.+so)*2.2);'+
+    'g=pow(1.-abs(g*2.-1.),2.2);'+
+    'return mix(vec3(.19,.09,.04),vec3(.64,.35,.14),g)*(.75+.50*FB(p*9.+so));}'+
+    // 6 — topographic contours
+    'if(k<7.){float h=FB(p*(2.2+sd*1.8)+so+vec2(0.,t*.05));'+
+    'float g=fract(h*(9.+floor(sd*7.)));'+
+    'float l=smoothstep(.80,1.,abs(g*2.-1.));'+
+    'vec3 base=mix(vec3(.06,.10,.15),vec3(.14,.38,.50),h);'+
+    'return mix(base,vec3(.60,.98,.88),l*.85);}'+
+    // 7 — normal map
+    'if(k<8.){float e=.02,f0=FB(p*3.5+so);'+
+    'float dx=FB((p+vec2(e,0.))*3.5+so)-f0;'+
+    'float dy=FB((p+vec2(0.,e))*3.5+so)-f0;'+
+    'return normalize(vec3(-dx*10.,-dy*10.,1.))*.5+.5;}'+
+    // 8 — plasma
+    'if(k<9.){float a=p.x*(5.+sd*3.)+t*.5+so.x,b=p.y*(5.+sd*3.)-t*.35+so.y;'+
+    'float v=(sin(a)+sin(b)+sin((a+b)*.7)+sin(length(p-.5)*14.-t))*.125+.5;'+
+    'vec3 pc=.45+.42*cos(6.2831*(v+vec3(0.,.33,.67))+sd*6.);'+
+    'return mix(vec3(dot(pc,vec3(.33))),pc,.45)*.80;}'+
+    // 9 — droplets with a specular hit
+    'if(k<10.){vec2 g=p*(3.+sd*2.)+so;vec2 i2=floor(g),f2=fract(g);'+
+    'float best=8.;vec2 bo=vec2(0.);'+
+    'for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 o=vec2(float(x),float(y));'+
+    'vec2 pc=o+.2+.6*h2(i2+o);float d=length(pc-f2);'+
+    'if(d<best){best=d;bo=f2-pc;}}'+
+    'float rr=.30+.12*sin(t*.6+sd*20.);'+
+    'vec3 n=normalize(vec3(bo/max(rr,.001),.85));'+
+    'float sp=pow(max(dot(n,normalize(vec3(-.5,.6,.7))),0.),18.);'+
+    'return mix(vec3(.10,.07,.03),vec3(.86,.58,.16)+sp,smoothstep(rr,rr*.86,best));}'+
+    // 10 — ridged multifractal (erosion / terrain)
+    'if(k<11.){vec2 q=p*(2.6+sd*1.6)+so+vec2(t*.08,0.);'+
+    'float r=0.,a=.55,sk=1.;'+
+    'for(int i=0;i<4;i++){float n=1.-abs(n2(q*sk)*4.-1.);r+=n*n*a;sk*=2.03;a*=.5;}'+
+    'r=clamp(r*.6,0.,1.);'+
+    'return mix(mix(vec3(.10,.13,.17),vec3(.42,.52,.62),r),vec3(1.,.95,.85),smoothstep(.70,.98,r));}'+
+    // 11 — halftone mask driven by noise
+    'if(k<12.){float n2c=6.+floor(sd*7.);vec2 g=p*n2c;vec2 f2=fract(g)-.5;'+
+    'float v=FB(p*2.4+so+vec2(t*.1,0.));'+
+    'float rad=.06+v*.42;'+
+    'return mix(vec3(.06,.03,.08),mix(vec3(.92,.36,.86),vec3(1.,.92,.98),v),'+
+    'smoothstep(rad,rad*.75,length(f2)));}'+
+    // 12 — water caustics
+    'if(k<13.){vec2 q=p*(3.+sd*2.5)+so;vec2 i2=floor(q),f2=fract(q);float d1=8.;'+
+    'for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 o=vec2(float(x),float(y));'+
+    'vec2 r=h2(i2+o);r=.5+.5*sin(t*.7+6.2831*r);d1=min(d1,length(o+r-f2));}'+
+    'float w=pow(1.-smoothstep(.0,.44,d1),3.);'+
+    'return mix(vec3(.02,.10,.17),vec3(.55,.98,1.),w);}'+
+    // 13 — radial burst
+    'if(k<14.){vec2 q=p-.5+(vec2(sd,fract(sd*7.))-.5)*.30;'+
+    'float v=sin(atan(q.y,q.x)*(8.+floor(sd*14.))+t*.4+so.x)*.5+.5;'+
+    'v*=smoothstep(.75,.05,length(q));v+=FB(p*4.+so)*.28;'+
+    'return mix(vec3(.06,.04,.10),vec3(1.,.78,.32),clamp(v,0.,1.));}'+
+    // 14 — cracked glaze
+    'if(k<15.){vec2 q=p*(3.5+sd*2.5)+so;vec2 i2=floor(q),f2=fract(q);'+
+    'float d1=8.,d2=8.;'+
+    'for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 o=vec2(float(x),float(y));'+
+    'vec2 r=h2(i2+o);float d=length(o+r-f2);'+
+    'if(d<d1){d2=d1;d1=d;}else if(d<d2){d2=d;}}'+
+    'vec3 base=mix(vec3(.34,.12,.28),vec3(.72,.42,.30),FB(p*2.+so));'+
+    'return mix(base,vec3(1.,.97,.92),smoothstep(.06,.0,d2-d1)*.9);}'+
+    // 15 — turbulent smoke
+    'vec2 q=p*2.4+so;'+
+    'float w1=FB(q+vec2(t*.12,0.));'+
+    'float w2=FB(q+vec2(w1*1.6,w1*1.2-t*.09));'+
+    'return mix(vec3(.05,.07,.11),vec3(.78,.84,.94),'+
+    'smoothstep(.18,.86,FB(q+vec2(w2*1.8,w2*1.4))));}'+
+    'float sdbox(vec2 p,vec2 b,float r){vec2 d=abs(p)-b+r;'+
+    'return length(max(d,0.))+min(max(d.x,d.y),0.)-r;}'+
+    // ── a real 3D fly-through ────────────────────────────────────────────
+    // The gallery is a FIXED field in world space and the camera moves through
+    // it, so nothing has to be recycled: slab index m is an absolute world
+    // coordinate, and as the camera advances slab k simply inherits what slab
+    // k+1 was showing, at exactly the right depth. Nothing pops.
+    //
+    // Every card is a tilted quad hit by an exact ray-plane intersection, so
+    // it keystones the way a real billboard does as you pass it — the further
+    // off-axis, the stronger the skew.
+    'vec2 uv0(vec2 p){return vec2(p.x*R.y/R.x,p.y);}'+
+    'const float CELL=1.0;'+       // world size of a grid cell
+    'const float SP=1.25;'+        // world distance between card planes
+    'const float NEARZ=0.06;'+     // the lens itself — a card only dies past this
+    'const float FARZ=11.6;'+
+    'void main(){'+
+    'vec2 p=(gl_FragCoord.xy-R*.5)/R.y;'+
+    'float zc=T*0.72;'+            // the camera flies forward
+    'vec2 cxy=vec2(sin(T*.055)*.55,cos(T*.041)*.32);'+   // and drifts gently
+    'vec3 ray=vec3(p,1.);'+
+    'vec3 col=vec3(0.);float rem=1.;float ev=0.;'+
+    'float m0=floor(zc/SP);'+
+    // front to back: once the accumulated cards are opaque we stop, so the
+    // cost stays at roughly one procedural texture per pixel
+    'for(int k=0;k<9;k++){'+
+    'if(rem<0.02)break;'+
+    'float m=m0+float(k);'+
+    'float z0=m*SP-zc;'+
+    // which cell of this plane does the ray cross?
+    'vec2 w=p*z0+cxy;'+
+    'vec2 g=w/CELL;vec2 id=floor(g);'+
+    'float h1=H21(id+m*7.13);'+
+    'float h2=H21(id*1.31+m*3.77+9.1);'+
+    'float h3=H21(id*0.77+m*5.19+21.3);'+
+    'float h4=H21(id*1.93+m*2.41+51.7);'+
+    'float h5=H21(id*2.11+m*8.31+77.1);'+
+    // one hash alone buckets unevenly into 16 families; mixing a second
+    // one by the golden ratio flattens the distribution
+    'float h6=fract(h1+H21(id*4.37+m*19.7+123.1)*.61803399);'+
+    // scatter each card along z inside its slab, so the plane stops being a
+    // WALL: cards cross the lens one at a time instead of all together
+    'float z=z0+(h5-.5)*SP*.56;'+
+    // IRREGULAR grid: every card has its own size and sits off-centre in its
+    // cell, and drifts slowly inside it — so no two rows line up
+    'vec2 jc=(vec2(h1,h2)-.5)*.17;'+
+    'jc+=.028*vec2(sin(T*.45+h1*6.283),cos(T*.38+h2*6.283));'+
+    'float hs=(.165+.115*h3)*CELL;'+
+    // ── keep the flight path CLEAR ───────────────────────────────────────
+    // A card's world z is fixed, so the exact moment the camera reaches its
+    // plane is known: tp = worldZ / speed. Evaluate the camera's drift at
+    // THAT moment and push the card out of a clearance circle around it, big
+    // enough to contain the card's own corner (hs*sqrt2) plus a margin. The
+    // path is then guaranteed to thread between the windows, never through
+    // one — and the cards it displaces open a corridor you fly down.
+    'float wz=m*SP+(h5-.5)*SP*.56;'+
+    'float tp=wz/0.72;'+
+    'vec2 cpass=vec2(sin(tp*.055)*.55,cos(tp*.041)*.32);'+
+    'vec2 ctr=(id+.5+jc)*CELL;'+
+    'vec2 dd=ctr-cpass;'+
+    'float rr=length(dd);'+
+    'float need=hs*1.4143+.16;'+
+    'if(rr<need){ctr+=(rr>1e-4?dd/rr:vec2(1.,0.))*(need-rr);}'+
+    'vec3 C=vec3(ctr-cxy,z);'+
+    // per-card tilt -> genuine perspective skew, not a flat billboard
+    'vec3 n=normalize(vec3((h2-.5)*.40,(h4-.5)*.32,1.));'+
+    'float dn=dot(ray,n);'+
+    'if(dn<1e-3)continue;'+
+    'float td=dot(C,n)/dn;'+
+    'if(td<NEARZ)continue;'+
+    'vec3 P=ray*td;'+
+    'vec3 U=normalize(cross(vec3(0.,1.,0.),n));'+
+    'vec3 V=cross(n,U);'+
+    'vec2 ab=vec2(dot(P-C,U),dot(P-C,V));'+
+    'float aa=1.6*td/R.y;'+        // one pixel, measured in world units
+    'float box=sdbox(ab,vec2(hs),hs*.16);'+
+    'float mk=smoothstep(aa,-aa,box);'+
+    // haze in at the far end, dissolve as it passes the camera — both happen
+    // WITH real cards behind, so neither reads as a fade to black
+    'float fog=smoothstep(FARZ,FARZ-4.2,td);'+
+    'float a=mk*fog;'+
+    'if(a>0.004){'+
+    // distance LOD: a card only a few pixels wide shimmers, so flatten it
+    // toward its own average — kills the aliasing and doubles as aerial haze.
+    // Below the threshold we skip the procedural texture ENTIRELY and use the
+    // family's average tone, which is what it would have averaged to anyway.
+    // That is what keeps the cost flat no matter how deep the field goes.
+    'float cpx=2.*hs*R.y/td;'+
+    // sharp in the middle distance only: a few-pixel card shimmers, and one
+    // right on the lens is past any focal distance. Both flatten toward their
+    // own average — depth of field, not a fade, so the card stays solid.
+    'float lod=min(smoothstep(26.,110.,cpx),smoothstep(3000.,1100.,cpx));'+
+    'vec3 c;'+
+    'if(lod<0.10||ev>2.5||td>7.6){'+   // deep haze swallows the detail anyway
+    
+    'c=(.30+.26*cos(6.2831*(h6+vec3(0.,.33,.67))))*(.72+.5*h3);'+
+    '}else{'+
+    'ev+=1.;'+
+    'vec2 lp=ab/hs*.5+.5;'+
+    'float ra=h4*6.2831,cs=cos(ra),sn=sin(ra);'+
+    // scale AND mirror AND rotate the sampling frame per card
+    'float zz=mix(0.65,1.70,fract(h3*7.31));'+
+    'vec2 lq=(lp-.5)*zz;lq=vec2(cs*lq.x-sn*lq.y,sn*lq.x+cs*lq.y)+.5;'+
+    'if(fract(h5*3.13)>.5)lq.x=1.-lq.x;'+
+    'if(fract(h5*7.71)>.5)lq.y=1.-lq.y;'+
+    'c=gfx(h6,h3,lq,T);'+
+    // ...then give the card its own colour treatment, so even two cards of
+    // the same family with the same pattern read as different previews
+    'c=hue(c,(h4-.5)*2.4);'+
+    'c=mix(vec3(dot(c,vec3(.299,.587,.114))),c,.55+.85*h3);'+
+    'c=clamp((c-.5)*(.85+.60*fract(h3*3.71))+.5,0.,1.);'+
+    'c*=.70+.34*fract(h1*5.31);'+
+    'c=clamp(pow(c,vec3(.88))*1.06,0.,1.);'+
+    'c=mix(vec3(dot(c,vec3(.32,.52,.16)))*.80,c,.26+.74*lod);'+
+    'c+=(H21(lq*vec2(263.,391.)+h3*77.)-.5)*.055*lod;'+
+    '}'+
+    'c=mix(c,vec3(.60,.64,.78),smoothstep(-aa*3.5,-aa*1.,box)*.30);'+
+    'c*=mix(.62,1.,smoothstep(.12,1.15,td));'+
+    'float atm=exp(-td*0.155);'+
+    'c=mix(vec3(.052,.060,.090),c,(.14+.86*atm)*(.30+.70*fog));'+
+    'col+=c*a*rem;rem*=(1.-a);'+
+    '}'+
+    '}'+
+    'float A=1.-rem;'+
+    'float hole=smoothstep(.08,.58,length(vec2((uv0(p).x)*1.02,(uv0(p).y)*1.42)));'+
+    'A*=mix(.05,1.,hole);'+
+    // front-to-back accumulation is premultiplied; this canvas wants straight
+    'gl_FragColor=vec4(col/max(A,.004),A);}',
+    null, null, 0.9);
+
+
+
+  // 02 — voronoi cells (teal)
+  run('canvas-voro',
+    'void main(){vec2 uv=gl_FragCoord.xy/R;vec2 p=uv*vec2(R.x/R.y,1.)*5.;'+
+    'vec2 i=floor(p),f=fract(p);float d=8.;'+
+    'for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 g=vec2(float(x),float(y));'+
+    'vec2 o=h2(i+g);o=.5+.5*sin(T*.6+6.2831*o);d=min(d,length(g+o-f));}'+
+    'float g=smoothstep(.0,.9,d);'+
+    'gl_FragColor=vec4(vec3(.12,.83,.67)*g,g*.8);}');
+
+  // 05 — brick/checker distortion (magenta glow on transparent)
+  run('canvas-cells',
+    'void main(){vec2 uv=gl_FragCoord.xy/R;vec2 p=uv*vec2(R.x/R.y,1.)*4.;'+
+    'p+=fbm(p+T*.1)*.7;vec2 g=fract(p)-.5;'+
+    'float d=smoothstep(.40,.49,max(abs(g.x),abs(g.y)));'+
+    'vec3 col=mix(vec3(.89,.39,.94),vec3(1.,.57,.32),fbm(p*.5));'+
+    'gl_FragColor=vec4(col*d,d*.8);}');
+})();
+
+// ─────────────────────────────────────────────────────────────────────────
+// Section 02 — wireframe plane / sphere / cube drifting randomly BEHIND the
+// text, like preview objects floating through the editor. One 2D canvas
+// covering the section; objects tumble, drift and bounce off the edges.
+// ─────────────────────────────────────────────────────────────────────────
+(function(){
+  function lines_plane(){
+    var L=[], n=5, s=1.0;
+    for(var i=0;i<=n;i++){
+      var t=-s+2*s*i/n;
+      L.push([[-s,0,t],[s,0,t]]);
+      L.push([[t,0,-s],[t,0,s]]);
+    }
+    return L;
+  }
+  function lines_sphere(){
+    // FULL wireframe ball: latitudes top-to-bottom + longitudes all around
+    var L=[], SEG=28;
+    for(var j=1;j<8;j++){
+      var ph=Math.PI*j/8, r=Math.sin(ph), y=Math.cos(ph), prev=null;
+      for(var i=0;i<=SEG;i++){
+        var th=2*Math.PI*i/SEG, p=[r*Math.cos(th), y, r*Math.sin(th)];
+        if(prev) L.push([prev,p]); prev=p;
+      }
+    }
+    for(var k=0;k<8;k++){
+      var th2=Math.PI*k/8, prev2=null;
+      for(var i2=0;i2<=SEG;i2++){
+        var ph2=2*Math.PI*i2/SEG;   // full meridian circle (both halves)
+        var p2=[Math.sin(ph2)*Math.cos(th2), Math.cos(ph2), Math.sin(ph2)*Math.sin(th2)];
+        if(prev2) L.push([prev2,p2]); prev2=p2;
+      }
+    }
+    return L;
+  }
+  function lines_bunny(){
+    // wireframe bunny built from transformed lat/long ellipsoids:
+    // body + head + two long ears + tail — reads instantly as the bunny
+    var L=[];
+    function ellipsoid(rx,ry,rz, cx,cy,cz, tilt, lats,longs,SEG){
+      var ct=Math.cos(tilt), st=Math.sin(tilt);
+      function P(th,ph){
+        var x=rx*Math.sin(ph)*Math.cos(th),
+            y=ry*Math.cos(ph),
+            z=rz*Math.sin(ph)*Math.sin(th);
+        // tilt around Z, then translate
+        var x2=x*ct-y*st, y2=x*st+y*ct;
+        return [x2+cx, y2+cy, z+cz];
+      }
+      var j,i,prev;
+      for(j=1;j<lats;j++){
+        var ph=Math.PI*j/lats; prev=null;
+        for(i=0;i<=SEG;i++){
+          var p=P(2*Math.PI*i/SEG, ph);
+          if(prev) L.push([prev,p]); prev=p;
+        }
+      }
+      for(var k=0;k<longs;k++){
+        var th=Math.PI*k/longs; prev=null;
+        for(i=0;i<=SEG;i++){
+          var p2=P(th, 2*Math.PI*i/SEG);
+          if(prev) L.push([prev,p2]); prev=p2;
+        }
+      }
+    }
+    ellipsoid(.62,.50,.55,   0,-.30, 0,   0,   4,4,16);   // body
+    ellipsoid(.30,.28,.28, .48, .28, 0,   0,   3,3,12);   // head
+    ellipsoid(.10,.40,.07, .42, .88, .14, -.25, 2,2,10);  // ear R
+    ellipsoid(.10,.40,.07, .42, .88,-.14,  .25, 2,2,10);  // ear L
+    ellipsoid(.13,.13,.13,-.62,-.12, 0,   0,   2,2,8);    // tail
+    return L;
+  }
+
+  var c = document.getElementById('wf-bg');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+
+  // drifting objects: position/velocity in fractions of the canvas,
+  // independent yaw & pitch spin rates, per-object colour and size
+  var objs = [
+    { lines: lines_plane(),  col:'rgb(90,75,255)',  x:.18, y:.30, vx: .016, vy: .011, ry:.00030, rx:.00019, ph:0.9, size:.16 },
+    { lines: lines_sphere(), col:'rgb(0,168,135)',  x:.80, y:.22, vx:-.012, vy: .014, ry:.00022, rx:.00013, ph:2.1, size:.19 },
+    { lines: lines_bunny(),  col:'rgb(255,122,61)', x:.55, y:.75, vx: .013, vy:-.012, ry:.00034, rx:.00021, ph:4.2, size:.17 },
+  ];
+
+  var vis = true, last = null;
+  if ('IntersectionObserver' in window)
+    new IntersectionObserver(function(e){ vis = e[0].isIntersecting; }).observe(c);
+
+  function frame(t){
+    requestAnimationFrame(frame);
+    if (!vis) { last = t; return; }
+    var dt = last == null ? 16 : Math.min(50, t - last);
+    last = t;
+
+    var dpr = window.devicePixelRatio || 1;
+    var w = c.clientWidth, h = c.clientHeight;
+    if (!w || !h) return;
+    if (c.width !== w*dpr || c.height !== h*dpr){ c.width = w*dpr; c.height = h*dpr; }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    ctx.lineCap = 'round';
+
+    for (var o=0; o<objs.length; o++){
+      var ob = objs[o];
+
+      // drift + soft bounce off the edges (in normalized coords per second)
+      ob.x += ob.vx * dt/1000;
+      ob.y += ob.vy * dt/1000;
+      var m = 0.10;
+      if (ob.x < m)   { ob.x = m;   ob.vx =  Math.abs(ob.vx); }
+      if (ob.x > 1-m) { ob.x = 1-m; ob.vx = -Math.abs(ob.vx); }
+      if (ob.y < m)   { ob.y = m;   ob.vy =  Math.abs(ob.vy); }
+      if (ob.y > 1-m) { ob.y = 1-m; ob.vy = -Math.abs(ob.vy); }
+
+      var a = t*ob.ry + ob.ph;          // yaw
+      var b = 0.35 + Math.sin(t*ob.rx + ob.ph)*0.5;  // tumbling pitch
+      var ca=Math.cos(a), sa=Math.sin(a), cb=Math.cos(b), sb=Math.sin(b);
+      var cx = ob.x*w, cy = ob.y*h;
+      var scale = Math.min(w, 900) * ob.size, dist = 3.8;
+
+      ctx.strokeStyle = ob.col;
+      ctx.lineWidth = 1.3;
+
+      var lines = ob.lines;
+      for (var i=0; i<lines.length; i++){
+        var seg = lines[i], pts = [], zs = 0;
+        for (var k=0; k<2; k++){
+          var p = seg[k];
+          var x = p[0]*ca + p[2]*sa, z = -p[0]*sa + p[2]*ca, y = p[1];
+          var y2 = y*cb - z*sb, z2 = y*sb + z*cb;
+          var f = dist/(dist + z2);
+          pts.push([cx + x*scale*f, cy - y2*scale*f]);
+          zs += z2;
+        }
+        // gentle depth fade — back lines stay visible so the full
+        // wireframe shape reads (especially the sphere)
+        var depth = Math.max(0, Math.min(1, (zs/2 + 1.2)/2.4));
+        ctx.globalAlpha = 0.55 - depth*0.25;
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        ctx.lineTo(pts[1][0], pts[1][1]);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(frame);
+})();
+
+// ─────────────────────────────────────────────────────────────────────────
+// Section 03 — the value pass, made visible behind "Don't eyeball it.
+// Measure it.": nothing but floating floats, colour-coded by range (clipped
+// >1 in orange, negatives in indigo, in-range teal), plus the probe
+// crosshair that samples them. One 2D canvas over the section header.
+// ─────────────────────────────────────────────────────────────────────────
+(function(){
+  var c = document.getElementById('num-bg');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+
+  var COL = {
+    normal: '45,214,178',     // teal   — in range
+    hot:    '255,146,81',     // orange — above 1 (clipped)
+    neg:    '140,124,255',    // indigo — negative
+    label:  '150,155,175',    // grey   — stat labels
+    ink:    '226,230,244'     // near-white — probe
+  };
+  function rgba(c, a){ return 'rgba(' + c + ',' + a + ')'; }
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function fmt(v){ return v.toFixed(3); }
+  function colFor(v){ return v > 1 ? COL.hot : (v < 0 ? COL.neg : COL.normal); }
+
+  var MONO = '"IBM Plex Mono", ui-monospace, monospace';
+
+  // ── drifting value tokens ───────────────────────────────────────────────
+  function makeToken(){
+    var r = Math.random(), text, col, size;
+    if (r < 0.16){
+      var kinds = [['min ', rnd(-0.4,0.3)], ['max ', rnd(0.8,2.4)],
+                   ['μ ', rnd(0.2,0.8)], ['t = ', rnd(0.1,0.9)]];
+      var k = kinds[(Math.random()*kinds.length)|0];
+      text = k[0] + fmt(k[1]); col = COL.label; size = rnd(11,14);
+    } else {
+      var v, t = Math.random();
+      if (t < 0.20)      v = rnd(1.0, 3.2);
+      else if (t < 0.38) v = rnd(-1.2, 0);
+      else               v = rnd(0, 1);
+      text = fmt(v); col = colFor(v); size = rnd(12,21);
+    }
+    return { text: text, col: col, size: size };
+  }
+  var N = 74, toks = [];
+  function spawn(i, randomAge){
+    var tk = makeToken();
+    tk.x = Math.random();
+    tk.y = randomAge ? Math.random() : 1.08;
+    tk.vy = rnd(0.014, 0.038);
+    tk.wob = rnd(0.5, 1.6);
+    tk.ph = rnd(0, 6.28);
+    tk.life = rnd(8, 15);
+    tk.age = randomAge ? rnd(0, tk.life*0.7) : 0;
+    toks[i] = tk;
+  }
+  for (var i=0;i<N;i++) spawn(i, true);
+
+  function lifeAlpha(o){
+    var a = o.age / o.life;
+    return Math.min(1, a/0.16) * Math.min(1, (1-a)/0.26);
+  }
+
+  var vis = true, last = null;
+  if ('IntersectionObserver' in window)
+    new IntersectionObserver(function(e){ vis = e[0].isIntersecting; }).observe(c);
+
+  function frame(t){
+    requestAnimationFrame(frame);
+    if (!vis) { last = t; return; }
+    var dt = last == null ? 0.016 : Math.min(0.05, (t - last)/1000);
+    last = t;
+
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var w = c.clientWidth, h = c.clientHeight;
+    if (!w || !h) return;
+    if (c.width !== (w*dpr|0) || c.height !== (h*dpr|0)){ c.width = w*dpr|0; c.height = h*dpr|0; }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    ctx.textBaseline = 'middle';
+
+    // ── floating values ──────────────────────────────────────────────────
+    ctx.textAlign = 'left';
+    for (var i2=0;i2<N;i2++){
+      var tk = toks[i2];
+      tk.age += dt;
+      tk.y -= tk.vy * dt;
+      if (tk.age > tk.life || tk.y < -0.08){ spawn(i2, false); tk = toks[i2]; }
+      var alpha = lifeAlpha(tk);
+      var x = tk.x*w + Math.sin(t*0.0004*tk.wob + tk.ph) * 20;
+      var y = tk.y*h;
+      ctx.font = tk.size + 'px ' + MONO;
+      ctx.fillStyle = rgba(tk.col, 1);
+      ctx.globalAlpha = alpha * (tk.col === COL.label ? 0.6 : 0.9);
+      ctx.fillText(tk.text, x, y);
+    }
+
+    // ── probe crosshair with a live readout box ──────────────────────────
+    var px = w*0.5 + Math.sin(t*0.00022)*w*0.32;
+    var py = h*0.48 + Math.cos(t*0.00017)*h*0.28;
+    var pv = 0.5 + 0.62*Math.sin(t*0.0006);
+    ctx.globalAlpha = 0.9;
+    ctx.strokeStyle = rgba(COL.ink, 0.95);
+    ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.arc(px, py, 10, 0, 6.2832); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(px-17, py); ctx.lineTo(px-6, py);
+    ctx.moveTo(px+6, py);  ctx.lineTo(px+17, py);
+    ctx.moveTo(px, py-17); ctx.lineTo(px, py-6);
+    ctx.moveTo(px, py+6);  ctx.lineTo(px, py+17);
+    ctx.stroke();
+
+    var label = fmt(pv);
+    ctx.font = '12.5px ' + MONO;
+    var tw = ctx.measureText(label).width;
+    var bx = px + 18, by = py - 26;
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = 'rgba(10,11,16,0.82)';
+    ctx.strokeStyle = rgba(colFor(pv), 0.8);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(bx, by, tw + 16, 22, 5);
+    else ctx.rect(bx, by, tw + 16, 22);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = rgba(colFor(pv), 1);
+    ctx.globalAlpha = 1;
+    ctx.fillText(label, bx + 8, by + 11);
+
+    // punch a soft elliptical hole where the headline and copy sit, so the
+    // field stays busy at the edges and the type stays perfectly legible
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.save();
+    ctx.translate(w*0.5, h*0.46);
+    ctx.scale(1.0, 0.72);
+    var hole = ctx.createRadialGradient(0, 0, 0, 0, 0, w*0.46);
+    hole.addColorStop(0.00, 'rgba(0,0,0,0.95)');
+    hole.addColorStop(0.55, 'rgba(0,0,0,0.72)');
+    hole.addColorStop(1.00, 'rgba(0,0,0,0)');
+    ctx.fillStyle = hole;
+    ctx.fillRect(-w, -h, w*2, h*2);
+    ctx.restore();
+    ctx.globalCompositeOperation = 'source-over';
+  }
+  requestAnimationFrame(frame);
+})();
+
+// ─────────────────────────────────────────────────────────────────────────
+// Section 07 — fake speed: motion streaks + little node cards zipping
+// across behind "Seamless & fast", each leaving a ghost trail.
+// ─────────────────────────────────────────────────────────────────────────
+(function(){
+  var c = document.getElementById('speed-bg');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+
+  var PALETTE = ['rgb(90,75,255)','rgb(0,168,135)','rgb(255,122,61)','rgb(201,75,212)'];
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function pick(arr){ return arr[(Math.random()*arr.length)|0]; }
+
+  // thin motion streaks (speed lines)
+  var NS = 18, streaks = [];
+  function spawnStreak(i, anywhere){
+    streaks[i] = {
+      y: rnd(0.04, 0.96),
+      v: rnd(900, 2600),                    // px/s — properly fast
+      x: anywhere ? rnd(-400, c.clientWidth||1200) : -rnd(100, 400),
+      lw: rnd(1, 2.2),
+      col: pick(PALETTE),
+      a: rnd(0.15, 0.4)
+    };
+    streaks[i].len = streaks[i].v * rnd(0.10, 0.16);   // longer when faster
+  }
+  for (var i=0;i<NS;i++) spawnStreak(i, true);
+
+  // little node cards zipping by with ghost trails
+  var NN = 4, nodes = [];
+  function spawnNode(i, anywhere){
+    nodes[i] = {
+      y: rnd(0.12, 0.88),
+      v: rnd(700, 1500),
+      x: anywhere ? rnd(-200, c.clientWidth||1200) : -rnd(150, 600),
+      w: rnd(30, 44), h: rnd(20, 26),
+      col: pick(PALETTE)
+    };
+  }
+  for (var j=0;j<NN;j++) spawnNode(j, true);
+
+  function drawNodeCard(x, y, nw, nh, col, alpha){
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = col;
+    ctx.lineWidth = 1.4;
+    // rounded card
+    var r = 4;
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+nw, y,    x+nw, y+nh, r);
+    ctx.arcTo(x+nw, y+nh, x,    y+nh, r);
+    ctx.arcTo(x,    y+nh, x,    y,    r);
+    ctx.arcTo(x,    y,    x+nw, y,    r);
+    ctx.closePath();
+    ctx.stroke();
+    // header line + sockets
+    ctx.beginPath();
+    ctx.moveTo(x, y + nh*0.35); ctx.lineTo(x+nw, y + nh*0.35);
+    ctx.stroke();
+    ctx.fillStyle = col;
+    ctx.beginPath(); ctx.arc(x,     y + nh*0.7, 1.8, 0, 6.2832); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+nw,  y + nh*0.7, 1.8, 0, 6.2832); ctx.fill();
+  }
+
+  var vis = true, last = null;
+  if ('IntersectionObserver' in window)
+    new IntersectionObserver(function(e){ vis = e[0].isIntersecting; }).observe(c);
+
+  function frame(t){
+    requestAnimationFrame(frame);
+    if (!vis) { last = t; return; }
+    var dt = last == null ? 0.016 : Math.min(0.05, (t - last)/1000);
+    last = t;
+
+    var dpr = window.devicePixelRatio || 1;
+    var w = c.clientWidth, h = c.clientHeight;
+    if (!w || !h) return;
+    if (c.width !== w*dpr || c.height !== h*dpr){ c.width = w*dpr; c.height = h*dpr; }
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,w,h);
+    ctx.lineCap = 'round';
+
+    // streaks: gradient tail → bright head
+    for (var i=0;i<NS;i++){
+      var s = streaks[i];
+      s.x += s.v * dt;
+      if (s.x - s.len > w) { spawnStreak(i, false); s = streaks[i]; }
+      var y = s.y * h;
+      var g = ctx.createLinearGradient(s.x - s.len, y, s.x, y);
+      g.addColorStop(0, 'rgba(255,255,255,0)');
+      g.addColorStop(1, s.col);
+      ctx.strokeStyle = g;
+      ctx.lineWidth = s.lw;
+      ctx.globalAlpha = s.a;
+      ctx.beginPath();
+      ctx.moveTo(s.x - s.len, y);
+      ctx.lineTo(s.x, y);
+      ctx.stroke();
+    }
+
+    // node cards with ghost trails (3 fading echoes behind each)
+    for (var k=0;k<NN;k++){
+      var n = nodes[k];
+      n.x += n.v * dt;
+      if (n.x - n.w*4 > w) { spawnNode(k, false); n = nodes[k]; }
+      var ny = n.y * h;
+      for (var e=3; e>=0; e--){
+        var ex = n.x - e * n.w * 0.9;
+        drawNodeCard(ex, ny, n.w, n.h, n.col, e === 0 ? 0.5 : 0.14*(3-e+1)/3);
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+(function(){
+  // launch sale: ends at the end of October 5 (visitor's local time)
+  var end = new Date(2026, 9, 5, 23, 59, 59);
+  var banner = document.getElementById('sale-banner');
+  var left = document.getElementById('sale-left');
+  function tick(){
+    var ms = end - new Date();
+    if (ms <= 0) { if (banner) banner.style.display = 'none'; return; }
+    var d = Math.floor(ms / 86400000), h = Math.floor(ms / 3600000) % 24;
+    if (left) left.textContent = d > 0 ? (d + (d === 1 ? ' day ' : ' days ') + h + 'h left') : (h + 'h left');
+  }
+  tick(); setInterval(tick, 60000);
+
+  // section videos: play only while on screen
+  var vids = document.querySelectorAll('video.section-video-media');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) { var p = e.target.play(); if (p && p.catch) p.catch(function(){}); }
+        else e.target.pause();
+      });
+    }, {threshold: 0.15});
+    vids.forEach(function(v){ io.observe(v); });
+  }
+})();
+</script>
 </body>
 </html>
